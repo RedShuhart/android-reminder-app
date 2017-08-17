@@ -1,0 +1,90 @@
+apply plugin: 'com.android.application'
+apply plugin: 'kotlin-android'
+apply plugin: 'realm-android'
+apply plugin: 'kotlin-kapt'
+
+android {
+    compileSdkVersion 25
+    buildToolsVersion "25.0.2"
+    defaultConfig {
+        applicationId "com.yuschukivan.remindme"
+        minSdkVersion 21
+        targetSdkVersion 25
+        versionCode 1
+        versionName "1.0"
+        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+    }
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+    }
+    sourceSets {
+        main.java.srcDirs += 'src/main/kotlin'
+    }
+
+    packagingOptions {
+        exclude 'META-INF/DEPENDENCIES'
+        exclude 'META-INF/dependencies'
+        exclude 'META-INF/NOTICE'
+        exclude 'META-INF/notice'
+        exclude 'META-INF/LICENSE'
+        exclude 'META-INF/license'
+        exclude 'META-INF/LICENSE.txt'
+        exclude 'META-INF/license.txt'
+        exclude 'META-INF/NOTICE.txt'
+        exclude 'META-INF/notice.txt'
+        exclude 'META-INF/LICENSE'
+        exclude 'META-INF/rxjava.properties'
+    }
+}
+
+dependencies {
+    compile fileTree(dir: 'libs', include: ['*.jar'])
+    androidTestCompile('com.android.support.test.espresso:espresso-core:2.2.2', {
+        exclude group: 'com.android.support', module: 'support-annotations'
+    })
+    compile "org.jetbrains.kotlin:kotlin-stdlib-jre7:$kotlin_version"
+//    compile 'it.sephiroth.android.library.targettooltip:target-tooltip-library:1.3.15'
+    
+
+    compile "com.android.support:design:$support_version"
+    compile "com.android.support:support-v4:$support_version"
+    
+    
+    //
+//    compile "com.facebook.android:facebook-android-sdk:$facebook_sdk_version"
+//    compile "com.fasterxml.jackson.core:jackson-databind:$jackson_version"
+//    compile "com.fasterxml.jackson.core:jackson-annotations:$jackson_version"
+//
+//    compile "org.springframework.android:spring-android-rest-template:$springrest_version"
+//
+    compile "com.google.dagger:dagger:$dagger_version"
+    kapt "com.google.dagger:dagger-compiler:$dagger_version"
+
+//    compile group: 'joda-time', name: 'joda-time', version: '2.9.9'
+
+    compile "com.arello-mobile:moxy-android:$moxy_version"
+    compile "com.arello-mobile:moxy:$moxy_version"
+    compile "com.arello-mobile:moxy-app-compat:$moxy_version"
+    kapt "com.arello-mobile:moxy-compiler:$moxy_version"
+
+    compile 'com.google.android.gms:play-services-location:8.1.0'
+    compile 'com.github.sundeepk:compact-calendar-view:2.0.2'
+    compile 'com.android.support.constraint:constraint-layout:1.0.2'
+    compile 'com.wdullaer:materialdatetimepicker:3.1.3'
+    compile 'com.android.support:appcompat-v7:25.0.0'
+    compile 'com.android.support:cardview-v7:25.0.0'
+    compile 'com.android.support:customtabs:25.0.0'
+    compile 'co.metalab.asyncawait:asyncawait:1.0.0'
+    compile 'id.zelory:compressor:1.0.4'
+    compile 'io.reactivex.rxjava2:rxjava:2.1.0'
+    compile 'io.reactivex.rxjava2:rxandroid:2.0.1'
+    compile 'com.google.android.gms:play-services-maps:8.1.0'
+    testCompile 'junit:junit:4.12'
+    provided 'javax.annotation:jsr250-api:1.0'
+}
+repositories {
+    mavenCentral()
+}

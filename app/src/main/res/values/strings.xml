@@ -1,0 +1,26 @@
+<resources>
+    <string name="app_name">RemindMe</string>
+    <string name="callendat_activity">Calendar</string>
+    <string name="search_title">Search</string>
+    <string name="view_nacigation_open">Open</string>
+    <string name="view_nacigation_close">Close</string>
+    <string name="add_name">Name</string>
+    <string name="add_notes">Notes</string>
+    <string name="info">Info</string>
+    <string name="add_date">Date</string>
+    <string name="add_time">Time</string>
+    <string name="add_repeats">Repeats</string>
+    <string name="reminder">Reminder</string>
+    <string name="date_time">Date and Time</string>
+    <string name="add_reminder">Add Reminder</string>
+    <string name="type_and_priority">Type and Priority</string>
+    <string name="type">Category</string>
+    <string name="priority">Priority</string>
+    <string name="nothing_for_this_date">Nothing for this date</string>
+    <string name="reminders">REMINDERS</string>
+    <string name="remind_on">Remind On:</string>
+    <string name="add_category">Add Category</string>
+    <string name="delete_category">Delete Category</string>
+    <string name="choose_location">Choose Location</string>
+    <string name="title_activity_maps">Map</string>
+</resources>
