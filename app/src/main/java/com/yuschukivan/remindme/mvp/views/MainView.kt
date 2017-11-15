@@ -14,6 +14,9 @@ interface MainView: MvpView{
     fun goToCalendar()
     fun goToAddReminder()
     fun updateTabsAdapter(categories: List<Categoty>)
-    fun  showError(s: String)
+    fun showError(s: String)
+    fun goToNearBy()
+    fun askPermissions()
+    fun goToTasks()
 
 }

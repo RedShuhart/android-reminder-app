@@ -21,10 +21,16 @@ package="com.yuschukivan.remindme">
         android:screenOrientation="portrait" />
     <activity android:name=".activities.AddReminderActivity" android:theme="@style/AppTheme"
         android:screenOrientation="portrait" />
+    <activity android:name=".features.task.view.TaskActivity" android:theme="@style/AppTheme"
+        android:screenOrientation="portrait" />
+    <activity android:name=".features.task.create.CreateTaskActivity" android:theme="@style/AppTheme"
+        android:screenOrientation="portrait" />
     <activity
         android:name="com.yuschukivan.remindme.activities.MapsActivity"
         android:label="@string/title_activity_maps">
     </activity>
+    <activity
+        android:name="com.yuschukivan.remindme.activities.NearByActivity"/>
 
     <receiver android:name=".services.NotificationReceiver" />
 

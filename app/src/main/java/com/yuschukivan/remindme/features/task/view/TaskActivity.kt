@@ -1,4 +1,4 @@
-package com.yuschukivan.remindme.activities
+package com.yuschukivan.remindme.features.task.view
 
 import android.Manifest
 import android.app.Activity
@@ -19,27 +19,27 @@ import android.view.Menu
 import android.view.MenuItem
 import android.widget.EditText
 import android.widget.Toast
-import com.arellomobile.mvp.MvpAppCompatActivity
 import com.arellomobile.mvp.presenter.InjectPresenter
 import com.yuschukivan.remindme.R
+import com.yuschukivan.remindme.activities.*
 import com.yuschukivan.remindme.adapters.TabsAdapter
+import com.yuschukivan.remindme.adapters.TaskTabAdapter
 import com.yuschukivan.remindme.common.utils.find
-import com.yuschukivan.remindme.features.task.view.TaskActivity
+import com.yuschukivan.remindme.features.task.create.CreateTaskActivity
+import com.yuschukivan.remindme.features.task.create.CreateTaskView
 import com.yuschukivan.remindme.models.Categoty
-import com.yuschukivan.remindme.mvp.presenters.MainPresenter
-import com.yuschukivan.remindme.mvp.views.MainView
 
 /**
- * Created by Ivan on 5/9/2017.
+ * Created by yusch on 08.11.2017.
  */
-class MainActivity: MvpAppCompatActivity(), MainView {
+class TaskActivity: BaseActivity(), TaskView {
 
     @InjectPresenter
-    lateinit var presenter: MainPresenter
+    lateinit var presenter: TaskPresenter
 
     val toolbar: Toolbar by lazy {
         find<Toolbar>(R.id.toolbar).apply {
-            setTitle(R.string.app_name)
+            setTitle(R.string.tasks)
             setOnMenuItemClickListener { false }
             inflateMenu( R.menu.menu)
         }
@@ -51,12 +51,12 @@ class MainActivity: MvpAppCompatActivity(), MainView {
 
     lateinit var drawerLayout: DrawerLayout
     lateinit var toggle: ActionBarDrawerToggle
-    lateinit var tabsAdapter: TabsAdapter
+    lateinit var tabsAdapter: TaskTabAdapter
 
     override fun onCreate(savedInstanceState: Bundle?) {
         setTheme(R.style.AppDefault)
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_main)
+        setContentView(R.layout.task_activity)
         setSupportActionBar(toolbar)
         supportActionBar!!.setDisplayShowHomeEnabled(true)
         supportActionBar!!.setShowHideAnimationEnabled(true)
@@ -78,18 +78,18 @@ class MainActivity: MvpAppCompatActivity(), MainView {
         navigationView.setNavigationItemSelectedListener { item ->
             drawerLayout.closeDrawers()
             when (item.itemId) {
-                R.id.tasks_item -> presenter.onTasks()
+                R.id.notification_item -> presenter.onMainActivity()
                 R.id.calendar_item -> presenter.onCalendar()
                 R.id.nearby_item -> presenter.dispatchLocationIntent()
             }
             false
         }
 
-        actionButton.setOnClickListener { presenter.onAddReminder() }
+        actionButton.setOnClickListener { presenter.onAddTask() }
     }
 
     fun initTabLayout(position: Int) {
-        tabsAdapter = TabsAdapter(supportFragmentManager)
+        tabsAdapter = TaskTabAdapter(supportFragmentManager)
         presenter.loadCategories()
         viewPager.adapter = tabsAdapter
         tabLayout.setupWithViewPager(viewPager)
@@ -132,7 +132,7 @@ class MainActivity: MvpAppCompatActivity(), MainView {
                     })
                     builder.show()
                 } else {
-                    builder.setMessage("Do you want to delete $title category?")
+                    builder.setMessage("Do you want to delete " + title + " category?")
                     builder.setPositiveButton("Delete",
                             DialogInterface.OnClickListener { dialog, which ->
                                 presenter.onDeleteCategory(tabsAdapter[viewPager.currentItem - 1])
@@ -160,27 +160,27 @@ class MainActivity: MvpAppCompatActivity(), MainView {
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent) {
-        if (requestCode == ADD_REMINDER_REQUEST) {
+        if (requestCode == CREATE_TASK_REQUEST) {
             if(resultCode == Activity.RESULT_OK) viewPager.setCurrentItem(data.getIntExtra("position", 0))
         }
     }
 
     override fun goToCalendar() {
-        startActivity(Intent(this,CalendarActivity::class.java))
+        startActivity(Intent(this, CalendarActivity::class.java))
     }
 
     override fun goToNearBy() {
         startActivity(Intent(this, NearByActivity::class.java))
     }
 
-    override fun goToTasks() {
-        finish()
-        startActivity(Intent(this, TaskActivity::class.java))
+    override fun goToAddTask() {
+        val intent = Intent(this, CreateTaskActivity::class.java)
+        startActivity(intent)
     }
 
-    override fun goToAddReminder() {
-        val intent = Intent(this, AddReminderActivity::class.java)
-        startActivity(intent)
+    override fun goToMain() {
+        finish()
+        startActivity(Intent(this, MainActivity::class.java))
     }
 
     override fun updateTabsAdapter(categories: List<Categoty>) {
@@ -194,21 +194,21 @@ class MainActivity: MvpAppCompatActivity(), MainView {
 
     companion object {
         private val ALL_NOTIFICATIONS = 0
-        private val ADD_REMINDER_REQUEST = 1
+        private val CREATE_TASK_REQUEST = 1
         private val LOCATION_FINE_PERMISSION_REQUEST = 4
     }
 
     override fun showError(s: String) {
-            val builder = android.app.AlertDialog.Builder(this)
-            builder.setMessage(s)
-                    .setTitle("Add Category")
-                    .setCancelable(false)
-                    .setPositiveButton("OK") { dialog, _ ->
-                        dialog.cancel()
-                    }
+        val builder = android.app.AlertDialog.Builder(this)
+        builder.setMessage(s)
+                .setTitle("Add Category")
+                .setCancelable(false)
+                .setPositiveButton("OK") { dialog, _ ->
+                    dialog.cancel()
+                }
 
-            val alert = builder.create()
-            alert.show()
+        val alert = builder.create()
+        alert.show()
     }
 
     override fun askPermissions() {

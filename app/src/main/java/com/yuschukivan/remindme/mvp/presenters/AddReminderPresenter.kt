@@ -29,6 +29,14 @@ import java.text.SimpleDateFormat
 import java.util.*
 import javax.inject.Inject
 import kotlin.coroutines.experimental.EmptyCoroutineContext.plus
+import com.google.android.gms.cast.CastRemoteDisplayLocalService.startService
+import android.R.attr.radius
+import com.yuschukivan.remindme.services.GeoService
+import com.yuschukivan.remindme.services.RemindGeoFence
+import com.google.android.gms.location.Geofence
+
+
+
 
 /**
  * Created by Ivan on 5/10/2017.
@@ -116,7 +124,19 @@ class AddReminderPresenter @Inject constructor() : MvpPresenter<AddReminderView>
             reminder.type = tempReminder.type
             reminder.category = tempReminder.category
             reminder.selectedDays = ""
-            if(latLong != null) reminder.latLong = latLong!!
+            latLong?.let {
+                reminder.latLong = it
+                val coords = it.split(",")
+                val transitionType = Geofence.GEOFENCE_TRANSITION_ENTER or  Geofence.GEOFENCE_TRANSITION_EXIT
+                val myGeofence = RemindGeoFence(it, coords[0].toDouble(), coords[1].toDouble(), 100f, transitionType)
+
+                val geofencingService = Intent(context, GeoService::class.java)
+                geofencingService.setAction(Math.random().toString())
+                geofencingService.putExtra(GeoService.EXTRA_ACTION, GeoService.Action.ADD)
+                geofencingService.putExtra(GeoService.EXTRA_GEOFENCE, myGeofence)
+
+                context.startService(geofencingService)
+            }
             if(address != null) reminder.address = address!!
             if(mapBitmap != null) {
                 val stream = ByteArrayOutputStream()

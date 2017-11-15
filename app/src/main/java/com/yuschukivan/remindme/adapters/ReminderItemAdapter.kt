@@ -13,9 +13,11 @@ import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
 import android.widget.Toast
+import com.makeramen.roundedimageview.RoundedImageView
 import com.yuschukivan.remindme.R
 import com.yuschukivan.remindme.common.utils.Util
 import com.yuschukivan.remindme.models.Reminder
+import io.reactivex.subjects.PublishSubject
 import io.realm.Realm
 import java.text.SimpleDateFormat
 
@@ -26,6 +28,7 @@ class ReminderItemAdapter(val data: MutableList<Reminder>):
         RecyclerView.Adapter<ReminderItemAdapter.Companion.ViewHolder>(), MutableList<Reminder> by data {
 
     constructor(): this(mutableListOf())
+
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         holder.titleTextView.text = data[position].title
@@ -72,8 +75,8 @@ class ReminderItemAdapter(val data: MutableList<Reminder>):
                 val descriptionTextView = itemView.findViewById(R.id.description_text) as TextView
                 val dateView = itemView.findViewById(R.id.date_text) as TextView
                 val priorityView = itemView.findViewById(R.id.priority_text) as TextView
-                val mapView = itemView.findViewById(R.id.map_view) as ImageView
-                val separator = itemView.findViewById(R.id.separator) as CardView
+                val mapView = itemView.findViewById(R.id.map_view) as RoundedImageView
+                val separator = itemView.findViewById(R.id.separator) as View
         }
     }
 }

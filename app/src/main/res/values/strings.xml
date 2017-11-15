@@ -7,12 +7,20 @@
     <string name="add_name">Name</string>
     <string name="add_notes">Notes</string>
     <string name="info">Info</string>
+    <string name="task">Task</string>
+    <string name="tasks">Tasks</string>
+    <string name="task_name">Task Name</string>
+    <string name="due_date">Due Date</string>
+    <string name="due_time">Due Time</string>
+    <string name="est_time">Est. Time</string>
     <string name="add_date">Date</string>
     <string name="add_time">Time</string>
     <string name="add_repeats">Repeats</string>
     <string name="reminder">Reminder</string>
     <string name="date_time">Date and Time</string>
     <string name="add_reminder">Add Reminder</string>
+    <string name="assign_reminder">Assign Reminder</string>
+    <string name="add_subtask">Add Subtask</string>
     <string name="type_and_priority">Type and Priority</string>
     <string name="type">Category</string>
     <string name="priority">Priority</string>
@@ -23,4 +31,5 @@
     <string name="delete_category">Delete Category</string>
     <string name="choose_location">Choose Location</string>
     <string name="title_activity_maps">Map</string>
+    <string name="google_app_id">remindme-171014</string>
 </resources>

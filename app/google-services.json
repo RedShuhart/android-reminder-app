@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "849984843143",
+    "project_id": "remindme-171014"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:849984843143:android:6e231c9d3becf293",
+        "android_client_info": {
+          "package_name": "com.yuschukivan.remindme"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "849984843143-fb799suvu8esq6ci9v6vvp12624l2tf7.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.yuschukivan.remindme",
+            "certificate_hash": "137b91117da19a8a709b97a97c22cb0101ceb8e6"
+          }
+        },
+        {
+          "client_id": "849984843143-8tr1qdqefb5s0a3a7uidpispofooqqdr.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDQsKeLnslLOQe9-XWiN0IZCSPtc9fXMwQ"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 1,
+          "other_platform_oauth_client": []
+        },
+        "ads_service": {
+          "status": 1
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

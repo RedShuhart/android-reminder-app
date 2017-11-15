@@ -1,26 +1,23 @@
-package com.yuschukivan.remindme.mvp.presenters
+package com.yuschukivan.remindme.features.task.view
 
 import android.Manifest
 import android.content.Context
-import android.content.Intent
 import android.content.pm.PackageManager
 import android.support.v4.content.ContextCompat
 import com.arellomobile.mvp.InjectViewState
 import com.arellomobile.mvp.MvpPresenter
 import com.yuschukivan.remindme.RemindApp
-import com.yuschukivan.remindme.activities.NearByActivity
-import com.yuschukivan.remindme.common.utils.RealmConfig
 import com.yuschukivan.remindme.models.Categoty
 import com.yuschukivan.remindme.models.Reminder
-import com.yuschukivan.remindme.mvp.views.MainView
+import com.yuschukivan.remindme.models.Task
 import io.realm.Realm
 import javax.inject.Inject
 
 /**
- * Created by Ivan on 5/9/2017.
+ * Created by yusch on 08.11.2017.
  */
 @InjectViewState
-class MainPresenter: MvpPresenter<MainView>(){
+class TaskPresenter: MvpPresenter<TaskView>() {
 
     @Inject
     lateinit var context: Context
@@ -44,8 +41,8 @@ class MainPresenter: MvpPresenter<MainView>(){
         }
     }
 
-    fun onAddReminder() {
-        viewState.goToAddReminder()
+    fun onAddTask() {
+        viewState.goToAddTask()
     }
 
     fun loadCategories() {
@@ -91,10 +88,9 @@ class MainPresenter: MvpPresenter<MainView>(){
     fun  onDeleteCategory(categoty: Categoty) {
         realm.executeTransaction {
             val default = realm.where(Categoty::class.java).equalTo("title", "Default").findFirst()
-            val  reminders = realm.where(Reminder::class.java).equalTo("type", categoty.title).findAll()
-            for(reminder in reminders) {
-                reminder.category = default
-                reminder.type = default.title
+            val  tasks = realm.where(Task::class.java).equalTo("category.title", categoty.title).findAll()
+            for(task in tasks) {
+                task.category = default
             }
             val  category = realm.where(Categoty::class.java).equalTo("id", categoty.id).findFirst()
             category.deleteFromRealm()
@@ -110,7 +106,8 @@ class MainPresenter: MvpPresenter<MainView>(){
         }
     }
 
-    fun onTasks() {
-        viewState.goToTasks()
+    fun onMainActivity() {
+        viewState.goToMain()
     }
+
 }

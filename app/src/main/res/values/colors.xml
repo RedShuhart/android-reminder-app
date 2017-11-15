@@ -8,6 +8,7 @@
     <color name="colorToolbarDark">#1B5E20</color>
     <color name="colorBackground">#ECEFF1</color>
     <color name="colorGrey">#E0E0E0</color>
+    <color name="colorDarkGrey">#A1A1A1</color>
     <color name="colorRed">#FF0000</color>
     <color name="colorYellow">#FFFF00</color>
     <color name="colorGreen">#00FF00</color>
