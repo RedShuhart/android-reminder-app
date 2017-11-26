@@ -17,7 +17,6 @@ interface AddReminderView: MvpView{
     fun  updateCategoriesSpinner(data: MutableList<Categoty>)
     fun  addButton(index: String, day: String)
     fun  highLight(id: Int, enable: Boolean)
-    fun  setMapImage(bmp: Bitmap)
     fun  showError(s: String)
 
 }

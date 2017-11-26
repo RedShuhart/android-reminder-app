@@ -24,6 +24,8 @@ import com.arellomobile.mvp.presenter.InjectPresenter
 import com.yuschukivan.remindme.R
 import com.yuschukivan.remindme.adapters.TabsAdapter
 import com.yuschukivan.remindme.common.utils.find
+import com.yuschukivan.remindme.features.calendar.CalendarActivity
+import com.yuschukivan.remindme.features.nearby.NearByActivity
 import com.yuschukivan.remindme.features.task.view.TaskActivity
 import com.yuschukivan.remindme.models.Categoty
 import com.yuschukivan.remindme.mvp.presenters.MainPresenter
@@ -34,12 +36,13 @@ import com.yuschukivan.remindme.mvp.views.MainView
  */
 class MainActivity: MvpAppCompatActivity(), MainView {
 
+
     @InjectPresenter
     lateinit var presenter: MainPresenter
 
     val toolbar: Toolbar by lazy {
         find<Toolbar>(R.id.toolbar).apply {
-            setTitle(R.string.app_name)
+            setTitle(R.string.reminders)
             setOnMenuItemClickListener { false }
             inflateMenu( R.menu.menu)
         }
@@ -81,6 +84,7 @@ class MainActivity: MvpAppCompatActivity(), MainView {
                 R.id.tasks_item -> presenter.onTasks()
                 R.id.calendar_item -> presenter.onCalendar()
                 R.id.nearby_item -> presenter.dispatchLocationIntent()
+                R.id.statistics_item -> presenter.onStatistics()
             }
             false
         }
@@ -159,14 +163,16 @@ class MainActivity: MvpAppCompatActivity(), MainView {
         return true
     }
 
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent) {
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         if (requestCode == ADD_REMINDER_REQUEST) {
-            if(resultCode == Activity.RESULT_OK) viewPager.setCurrentItem(data.getIntExtra("position", 0))
+            if(resultCode == Activity.RESULT_OK) {
+                data?.let {viewPager.setCurrentItem(it.getIntExtra("position", 0))}
+            }
         }
     }
 
     override fun goToCalendar() {
-        startActivity(Intent(this,CalendarActivity::class.java))
+        startActivity(Intent(this, CalendarActivity::class.java))
     }
 
     override fun goToNearBy() {
@@ -174,12 +180,16 @@ class MainActivity: MvpAppCompatActivity(), MainView {
     }
 
     override fun goToTasks() {
-        finish()
         startActivity(Intent(this, TaskActivity::class.java))
+        finish()
     }
 
     override fun goToAddReminder() {
         val intent = Intent(this, AddReminderActivity::class.java)
+        startActivity(intent)
+    }
+
+    override fun goToStatistics(intent: Intent) {
         startActivity(intent)
     }
 

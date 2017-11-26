@@ -60,10 +60,8 @@ class AddReminderActivity: MvpAppCompatActivity(), AddReminderView, AdapterView.
     val timeInput by lazy { findViewById(R.id.time_input) as EditText }
     val check by lazy { findViewById(R.id.add_check) as Button }
     val nameInput by lazy { findViewById(R.id.reminder_name_text) as EditText }
-    val noteInput by lazy { findViewById(R.id.notesText) as EditText }
     val typeSpinner by lazy { findViewById(R.id.type_spinner) as Spinner }
     val prioritySpinner by lazy { findViewById(R.id.priority_spinner) as Spinner }
-    val locationPicker by lazy { find<ImageView>(R.id.location_pcick)}
 
     val buttonsLayout by lazy { find<LinearLayout>(R.id.buttons_layout)}
 
@@ -124,14 +122,8 @@ class AddReminderActivity: MvpAppCompatActivity(), AddReminderView, AdapterView.
 
         presenter.loadButtons()
 
-        locationPicker.setOnClickListener {
-            val builder = PlacePicker.IntentBuilder()
-            startActivityForResult(builder.build(this), PLACE_PICKER_REQUEST);
-        }
-
-
         check.setOnClickListener {
-            presenter.onAddReminder(nameInput.text.toString(), noteInput.text.toString(), dateInput.text.toString(), timeInput.text.toString())
+            presenter.onAddReminder(nameInput.text.toString(), dateInput.text.toString(), timeInput.text.toString())
         }
 
         dateInput.setOnClickListener {
@@ -146,23 +138,6 @@ class AddReminderActivity: MvpAppCompatActivity(), AddReminderView, AdapterView.
     override fun onPause() {
         super.onPause()
         progress.hide()
-    }
-
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        when (requestCode) {
-            PLACE_PICKER_REQUEST -> {
-                if (resultCode == Activity.RESULT_OK) {
-                    async {
-                        presenter.onLocationSelected(PlacePicker.getPlace(data, applicationContext))
-
-                    }
-                }
-            }
-        }
-    }
-
-    override fun setMapImage(bmp: Bitmap) {
-        locationPicker.setImageBitmap(bmp)
     }
 
 

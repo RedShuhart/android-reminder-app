@@ -59,12 +59,7 @@ class AddReminderPresenter @Inject constructor() : MvpPresenter<AddReminderView>
     lateinit var time: Date
     lateinit var date: Date
     var fragmentPosition = 0
-    var mapBitmap: Bitmap? = null
-    var latLong: String? = null
-    var address: String? = null
-
     val buttons = mutableMapOf<Int, Boolean>()
-
 
     fun loadButtons() {
 
@@ -109,7 +104,7 @@ class AddReminderPresenter @Inject constructor() : MvpPresenter<AddReminderView>
             }
     }
 
-    fun onAddReminder(nameInput: String, noteInput: String, dateInput: String, timeInput: String) {
+    fun onAddReminder(nameInput: String, dateInput: String, timeInput: String) {
         if(nameInput.isEmpty()) {
             viewState.showError("Please Enter Name")
             return
@@ -118,38 +113,19 @@ class AddReminderPresenter @Inject constructor() : MvpPresenter<AddReminderView>
             val reminder = realm.createObject(Reminder::class.java, System.currentTimeMillis())
             reminder.notifications = ""
             reminder.title = nameInput
-            reminder.description = noteInput
             reminder.date = Date(date.time + time.time + 3600000L)
             reminder.priority = tempReminder.priority
             reminder.type = tempReminder.type
             reminder.category = tempReminder.category
             reminder.selectedDays = ""
-            latLong?.let {
-                reminder.latLong = it
-                val coords = it.split(",")
-                val transitionType = Geofence.GEOFENCE_TRANSITION_ENTER or  Geofence.GEOFENCE_TRANSITION_EXIT
-                val myGeofence = RemindGeoFence(it, coords[0].toDouble(), coords[1].toDouble(), 100f, transitionType)
 
-                val geofencingService = Intent(context, GeoService::class.java)
-                geofencingService.setAction(Math.random().toString())
-                geofencingService.putExtra(GeoService.EXTRA_ACTION, GeoService.Action.ADD)
-                geofencingService.putExtra(GeoService.EXTRA_GEOFENCE, myGeofence)
-
-                context.startService(geofencingService)
-            }
-            if(address != null) reminder.address = address!!
-            if(mapBitmap != null) {
-                val stream = ByteArrayOutputStream()
-                mapBitmap!!.compress(Bitmap.CompressFormat.PNG, 100, stream)
-                reminder.mapImage = stream.toByteArray()
-            }
-            val notifId = Util.NotificationUtil.generateNotification(context, nameInput, noteInput, date.time + time.time + 3600000L, Random().nextInt())
+            val notifId = Util.NotificationUtil.generateNotification(context, nameInput, "", date.time + time.time + 3600000L, Random().nextInt())
             Log.d("NotificationPresenter", "id: " + notifId)
             if(notifId != -1) reminder.notifications += "" + notifId
-            buttons.forEach { day, value ->
-                if(value) {
-                    reminder.notifications += " " + Util.NotificationUtil.generateNotificationRepeat(context, nameInput, noteInput, day, Random().nextInt())
-                    reminder.selectedDays += day.toString()
+            buttons.forEach {
+                if(it.value) {
+                    reminder.notifications += " " + Util.NotificationUtil.generateNotificationRepeat(context, nameInput, "", it.key, Random().nextInt())
+                    reminder.selectedDays += it.key.toString()
                 }
             }
             viewState.finishActivity(fragmentPosition)
@@ -202,16 +178,4 @@ class AddReminderPresenter @Inject constructor() : MvpPresenter<AddReminderView>
         data.addAll(realm.where(Categoty::class.java).findAll())
         viewState.updateCategoriesSpinner(data)
     }
-
-    fun  onLocationSelected(place: Place) {
-        async {
-            address = place.address.toString()
-            val url = URL("https://maps.googleapis.com/maps/api/staticmap?center=${place.latLng.latitude},${place.latLng.longitude}&zoom=15&size=850x200&markers=color:red%7C${place.latLng.latitude},${place.latLng.longitude}")
-            mapBitmap = await { BitmapFactory.decodeStream(url.openConnection().getInputStream()) }
-            latLong = place.latLng.latitude.toString() + "," + place.latLng.longitude.toString()
-            viewState.setMapImage(mapBitmap!!)
-        }
-    }
-
-
 }

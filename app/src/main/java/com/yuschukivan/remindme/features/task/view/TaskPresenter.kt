@@ -2,11 +2,15 @@ package com.yuschukivan.remindme.features.task.view
 
 import android.Manifest
 import android.content.Context
+import android.content.Intent
 import android.content.pm.PackageManager
 import android.support.v4.content.ContextCompat
+import android.util.Log
 import com.arellomobile.mvp.InjectViewState
 import com.arellomobile.mvp.MvpPresenter
+import com.yuschukivan.remindme.R
 import com.yuschukivan.remindme.RemindApp
+import com.yuschukivan.remindme.features.statistics.StatisticsActivity
 import com.yuschukivan.remindme.models.Categoty
 import com.yuschukivan.remindme.models.Reminder
 import com.yuschukivan.remindme.models.Task
@@ -24,6 +28,10 @@ class TaskPresenter: MvpPresenter<TaskView>() {
 
     @Inject
     lateinit var realm: Realm
+
+    var currentTab: Int = 0
+
+    val filters = mutableListOf<String>()
 
     init {
         RemindApp.appComponent.inject(this)
@@ -59,9 +67,10 @@ class TaskPresenter: MvpPresenter<TaskView>() {
                     "Default" -> 1
                     else -> 2
                 }
-            })
+            }, filters, false)
         }
     }
+
 
     fun onAddCategory(name: String) {
 
@@ -82,7 +91,7 @@ class TaskPresenter: MvpPresenter<TaskView>() {
                 "Default" -> 1
                 else -> 2
             }
-        })
+        }, filters, false)
     }
 
     fun  onDeleteCategory(categoty: Categoty) {
@@ -102,12 +111,50 @@ class TaskPresenter: MvpPresenter<TaskView>() {
                     "Default" -> 1
                     else -> 2
                 }
-            })
+            }, filters, true)
         }
     }
 
     fun onMainActivity() {
         viewState.goToMain()
+    }
+
+    fun saveCurrentTab(position: Int) {
+        currentTab = position
+    }
+
+    fun  setFilter(id: Int) {
+        when(id) {
+            R.id.DONE -> {
+                if(filters.contains("DONE")) {
+                    viewState.highLight(id, false)
+                    filters.remove("DONE")
+                } else {
+                    viewState.highLight(id, true)
+                    filters.add("DONE")
+                }
+
+            }
+            R.id.OVERDUE -> {
+                if (filters.contains("OVERDUE")) {
+                    viewState.highLight(id, false)
+                    filters.remove("OVERDUE")
+                } else {
+                    viewState.highLight(id, true)
+                    filters.add("OVERDUE")
+                }
+            }
+        }
+        filterTasks(filters)
+    }
+
+    private fun filterTasks(types: List<String>) {
+        loadCategories()
+    }
+
+    fun onStatistics() {
+        val intent = Intent(context, StatisticsActivity::class.java)
+        viewState.goToStatistics(intent)
     }
 
 }

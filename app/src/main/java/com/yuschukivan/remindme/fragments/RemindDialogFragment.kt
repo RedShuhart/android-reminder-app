@@ -46,10 +46,8 @@ class RemindDialogFragment: MvpDialogFragment(), RemindDialogView, AdapterView.O
     lateinit var timeText: EditText
     lateinit var priorityText: Spinner
     lateinit var categoryText: Spinner
-    lateinit var commentText: TextView
     lateinit var titleText: TextView
     lateinit var deleteButton: Button
-    lateinit var mapImage: ImageView
     lateinit var applyButton: Button
     lateinit var cancelButton: Button
 
@@ -91,7 +89,6 @@ class RemindDialogFragment: MvpDialogFragment(), RemindDialogView, AdapterView.O
         val time = mArgs.getString("time")
         val priority = mArgs.getString("priority")
         val category = mArgs.getString("category")
-        val comment = mArgs.getString("comment")
         val title = mArgs.getString("title")
         val id = mArgs.getLong("id")
         val map = mArgs.getByteArray("bitmap")
@@ -100,10 +97,8 @@ class RemindDialogFragment: MvpDialogFragment(), RemindDialogView, AdapterView.O
         timeText = view.findViewById(R.id.time_text) as EditText
         priorityText = view.findViewById(R.id.priority_input) as Spinner
         categoryText = view.findViewById(R.id.category_input) as Spinner
-        commentText = view.findViewById(R.id.comment) as EditText
         titleText = view.findViewById(R.id.title) as EditText
         deleteButton = view.findViewById(R.id.delete_button) as Button
-        mapImage = view.findViewById(R.id.map_image) as ImageView
         buttonsLayout = view.findViewById(R.id.buttons_holder) as LinearLayout
         applyButton = view.findViewById(R.id.apply_changes) as Button
         cancelButton = view.findViewById(R.id.cancel) as Button
@@ -130,13 +125,7 @@ class RemindDialogFragment: MvpDialogFragment(), RemindDialogView, AdapterView.O
         timeText.setText(time)
         presenter.onSetTypePosition(id)
         priorityText.setSelection(priorityCategories.indexOf(priority))
-        commentText.setText(comment)
         titleText.setText(title)
-        if(map != null) {
-            mapImage.setImageBitmap(BitmapFactory.decodeByteArray(map, 0, map.size))
-        } else {
-            mapImage.visibility = View.GONE
-        }
 
         deleteButton.setOnClickListener {
             presenter.deleteReminder(id)
@@ -152,18 +141,9 @@ class RemindDialogFragment: MvpDialogFragment(), RemindDialogView, AdapterView.O
             presenter.onShowChooseTime()
         }
 
-//        mapImage.setOnClickListener {
-//            val builder = PlacePicker.IntentBuilder()
-//            startActivityForResult(builder.build(activity), AddReminderActivity.PLACE_PICKER_REQUEST);
-//        }
-
-        mapImage.setOnClickListener {
-            presenter.onMap(id)
-        }
-
         cancelButton.setOnClickListener { dismiss() }
 
-        applyButton.setOnClickListener { presenter.onApply(id, titleText.text.toString(), commentText.text.toString()) }
+        applyButton.setOnClickListener { presenter.onApply(id, titleText.text.toString()) }
         applyButton.visibility = View.VISIBLE
 
         return view
@@ -171,26 +151,6 @@ class RemindDialogFragment: MvpDialogFragment(), RemindDialogView, AdapterView.O
 
     override fun goToActivity(intent: Intent) {
         startActivityForResult(intent, MAP_REQUEST)
-    }
-
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        when (requestCode) {
-            AddReminderActivity.PLACE_PICKER_REQUEST -> {
-                if (resultCode == Activity.RESULT_OK) {
-                    async {
-                        presenter.onLocationSelected(PlacePicker.getPlace(data, activity.applicationContext))
-
-                    }
-                }
-            }
-            MAP_REQUEST -> {
-                if (resultCode == Activity.RESULT_OK) {
-                    async {
-                        presenter.onLocationSelected(PlacePicker.getPlace(data, activity.applicationContext))
-                    }
-                }
-            }
-        }
     }
 
     override fun close() {
@@ -214,9 +174,7 @@ class RemindDialogFragment: MvpDialogFragment(), RemindDialogView, AdapterView.O
             args.putString("date", SimpleDateFormat("dd/MM/yyyy").format(reminder.date))
             args.putString("time", SimpleDateFormat("HH:mm").format(reminder.date))
             args.putString("priority", reminder.priority)
-            args.putString("comment", reminder.description)
             args.putString("title", reminder.title)
-            args.putByteArray("bitmap", reminder.mapImage)
             val dialog = RemindDialogFragment()
             dialog.arguments = args
             return dialog
@@ -274,12 +232,6 @@ class RemindDialogFragment: MvpDialogFragment(), RemindDialogView, AdapterView.O
         if(enable) btn?.setBackgroundResource(R.drawable.circle_button_highlited)
         else btn?.setBackgroundResource(R.drawable.circle_button)
     }
-
-    override fun setMapImage(bmp: Bitmap) {
-        mapImage.setImageBitmap(bmp)
-        showApply()
-    }
-
     override fun showApply() {
         Log.d("Dialog", "Show")
         applyButton.visibility = View.VISIBLE

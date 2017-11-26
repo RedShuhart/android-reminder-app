@@ -29,25 +29,23 @@
         android:layout_height="match_parent"
         app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
-        <com.github.sundeepk.compactcalendarview.CompactCalendarView
-            xmlns:app="http://schemas.android.com/apk/res-auto"
+        <com.github.sundeepk.compactcalendarview.CompactCalendarView xmlns:app="http://schemas.android.com/apk/res-auto"
             android:id="@+id/compactcalendar_view"
-            android:layout_marginTop="16dp"
             android:layout_width="match_parent"
-            android:paddingRight="10dp"
-            android:paddingLeft="10dp"
             android:layout_height="match_parent"
+            android:layout_marginTop="16dp"
             android:layout_weight="1"
-            app:compactCalendarCurrentDayIndicatorStyle="no_fill_large_indicator"
-            app:compactCalendarTargetHeight="250dp"
-            app:compactCalendarTextSize="14sp"
+            android:paddingLeft="10dp"
+            android:paddingRight="10dp"
             app:compactCalendarBackgroundColor="@color/colorBackground"
-            app:compactCalendarTextColor="#000000"
-            app:compactCalendarCurrentSelectedDayIndicatorStyle="no_fill_large_indicator"
-            app:compactCalendarCurrentSelectedDayBackgroundColor="@color/colorAccent"
             app:compactCalendarCurrentDayBackgroundColor="@color/colorPrimary"
+            app:compactCalendarCurrentDayIndicatorStyle="no_fill_large_indicator"
+            app:compactCalendarCurrentSelectedDayBackgroundColor="@color/colorAccent"
+            app:compactCalendarCurrentSelectedDayIndicatorStyle="no_fill_large_indicator"
             app:compactCalendarMultiEventIndicatorColor="@color/colorAccent"
-            />
+            app:compactCalendarTargetHeight="250dp"
+            app:compactCalendarTextColor="#000000"
+            app:compactCalendarTextSize="14sp" />
 
         <TextView
             android:id="@+id/picked_date"
@@ -67,11 +65,44 @@
             <FrameLayout
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:layout_weight="1">
+                android:layout_weight="0.9">
 
                 <android.support.constraint.ConstraintLayout
                     android:layout_width="match_parent"
                     android:layout_height="match_parent">
+
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="0dp"
+                        android:orientation="vertical"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintLeft_toLeftOf="parent"
+                        app:layout_constraintRight_toRightOf="parent"
+                        app:layout_constraintTop_toTopOf="parent">
+
+                        <android.support.v7.widget.RecyclerView
+                            android:layout_height="match_parent"
+                            android:layout_width="match_parent"
+                            android:layout_weight="1"
+                            android:id="@+id/reminde_recycle_view"
+                            android:background="@color/colorBackground"
+                            tools:layout_editor_absoluteX="8dp"
+                            tools:layout_editor_absoluteY="8dp">
+
+                        </android.support.v7.widget.RecyclerView>
+
+                        <android.support.v7.widget.RecyclerView
+                            android:id="@+id/task_recycle_view"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:layout_weight="0.5"
+                            android:background="@color/colorBackground"
+                            tools:layout_editor_absoluteX="8dp"
+                            tools:layout_editor_absoluteY="259dp">
+
+                        </android.support.v7.widget.RecyclerView>
+
+                    </LinearLayout>
 
                     <TextView
                         android:id="@+id/placeholder_text"
@@ -84,14 +115,11 @@
                         app:layout_constraintLeft_toLeftOf="parent"
                         android:text="@string/nothing_for_this_date" />
 
+
+
                 </android.support.constraint.ConstraintLayout>
 
-                <android.support.v7.widget.RecyclerView
-                    android:id="@+id/recycle_view"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:background="@color/colorBackground">
-                </android.support.v7.widget.RecyclerView>
+
 
             </FrameLayout>
 

@@ -30,6 +30,7 @@ class AssignReminderDialog: AssignReminderView, MvpDialogFragment() {
     lateinit var dateText: EditText
     lateinit var applyButton: Button
     lateinit var cancelButton: Button
+    lateinit var deleteButton: Button
 
     lateinit var buttonsLayout: LinearLayout
 
@@ -52,6 +53,7 @@ class AssignReminderDialog: AssignReminderView, MvpDialogFragment() {
     ) }
 
     val assigns = PublishSubject.create<ReminderInfo>()
+    val deletes = PublishSubject.create<String>()
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val view = inflater.inflate(R.layout.assign_reminder_dialog, container, false)
@@ -59,11 +61,14 @@ class AssignReminderDialog: AssignReminderView, MvpDialogFragment() {
         val mArgs = arguments
         val date: String = mArgs.getString("date", "")
         val repeats: String = mArgs.getString("repeats", "")
+        val wasAssigned: Boolean = mArgs.getBoolean("wasAssigned", false)
 
-        dateText = view.findViewById(R.id.date_text) as EditText
-        buttonsLayout = view.findViewById(R.id.buttons_holder) as LinearLayout
-        applyButton = view.findViewById(R.id.apply_changes) as Button
+
+        dateText = view.findViewById(R.id.time_text) as EditText
+        buttonsLayout = view.findViewById(R.id.assign_reminder_buttons_layout) as LinearLayout
+        applyButton = view.findViewById(R.id.assign_reminder_button) as Button
         cancelButton = view.findViewById(R.id.cancel) as Button
+        deleteButton = view.findViewById(R.id.delete_assigned) as Button
 
         presenter.onLoad(date, repeats)
 
@@ -71,7 +76,12 @@ class AssignReminderDialog: AssignReminderView, MvpDialogFragment() {
             presenter.onShowChooseDate()
         }
 
+        if(wasAssigned) deleteButton.visibility = View.VISIBLE
+            else deleteButton.visibility = View.GONE
+
         cancelButton.setOnClickListener { dismiss() }
+
+        deleteButton.setOnClickListener { presenter.onDelete() }
 
         applyButton.setOnClickListener { presenter.onApply() }
 
@@ -85,10 +95,11 @@ class AssignReminderDialog: AssignReminderView, MvpDialogFragment() {
                 val repeats: String
         )
 
-        fun newInstance(date: String, repeats: String): AssignReminderDialog {
+        fun newInstance(date: String, repeats: String?, wasAssigned: Boolean): AssignReminderDialog {
             val args = Bundle()
             args.putString("date", date)
             args.putString("repeats", repeats)
+            args.putBoolean("wasAssigned", wasAssigned)
             val dialog = AssignReminderDialog()
             dialog.arguments = args
             return dialog
@@ -105,6 +116,11 @@ class AssignReminderDialog: AssignReminderView, MvpDialogFragment() {
 
     override fun setDateText(date: String) {
         dateText.setText(date)
+    }
+
+    override fun finishWithDelete() {
+        deletes.onNext("deleted")
+        dismiss()
     }
 
     override fun finishWithAssign(date: String, repeats: String) {

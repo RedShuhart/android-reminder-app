@@ -11,17 +11,13 @@ open class Reminder(
         @PrimaryKey
         var id: Long,
         var title: String,
-        var description: String,
         var priority: String,
-        var latLong: String,
         var selectedDays: String,
         var notifications: String,
-        var mapImage: ByteArray?,
         var date: Date,
         var type: String,
-        var category: Categoty?,
-        var address: String
+        var category: Categoty?
 ): RealmObject(){
-        constructor(): this(id = 0L, title = "", description = "", priority = "", latLong = "",
-                selectedDays = "", notifications = "", mapImage = null, date = Calendar.getInstance().time, type = "", category = null, address = "")
+        constructor(): this(id = 0L, title = "", priority = "",
+                selectedDays = "", notifications = "", date = Calendar.getInstance().time, type = "", category = null)
 }

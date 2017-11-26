@@ -13,4 +13,5 @@ interface AssignReminderView: MvpView {
     fun finishWithAssign(date: String, repeats: String)
     fun setDateText(date: String)
     fun showTimePicker()
+    fun finishWithDelete()
 }

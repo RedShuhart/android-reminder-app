@@ -22,12 +22,10 @@
 
     </android.support.design.widget.AppBarLayout>
 
-    <android.support.constraint.ConstraintLayout xmlns:app="http://schemas.android.com/apk/res-auto"
-        xmlns:tools="http://schemas.android.com/tools"
+    <android.support.constraint.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        app:layout_behavior="@string/appbar_scrolling_view_behavior"
-        xmlns:android="http://schemas.android.com/apk/res/android">
+        app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
         <fragment xmlns:android="http://schemas.android.com/apk/res/android"
             xmlns:map="http://schemas.android.com/apk/res-auto"
@@ -47,7 +45,7 @@
             map:layout_constraintVertical_bias="1.0" />
 
         <android.support.v7.widget.CardView
-            android:layout_width="match_parent"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:id="@+id/card_view"
             android:layout_marginRight="8dp"
@@ -57,82 +55,138 @@
             app:layout_constraintTop_toTopOf="parent"
             android:layout_marginTop="8dp"
             android:elevation="2dp"
-            app:cardCornerRadius="4dp">
+            app:cardCornerRadius="4dp"
+            android:layout_marginStart="8dp"
+            android:layout_marginEnd="8dp">
+
 
             <android.support.constraint.ConstraintLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content">
 
                 <TextView
+                    android:id="@+id/task_title"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:id="@+id/title_text"
-                    android:textSize="18sp"
-                    android:text="Title"
+                    android:layout_marginLeft="8dp"
+                    android:text="Task Name"
                     android:textColor="@color/colorAccent"
+                    android:textSize="15sp"
                     app:layout_constraintLeft_toLeftOf="parent"
+                    app:layout_constraintTop_toTopOf="@+id/task_status"
+                    app:layout_constraintBottom_toBottomOf="@+id/task_status"
+                    android:layout_marginStart="8dp" />
+
+                <ImageView
+                    android:id="@+id/task_status"
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:text="High"
+                    android:layout_marginRight="8dp"
+                    app:layout_constraintRight_toRightOf="parent"
                     app:layout_constraintTop_toTopOf="parent"
-                    tools:layout_editor_absoluteX="0dp"
                     android:layout_marginTop="8dp"
-                    android:layout_marginLeft="8dp" />
+                    android:layout_marginEnd="8dp" />
 
                 <TextView
+                    android:id="@+id/task_priority"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:id="@+id/description_text"
-                    android:text="This is Description"
-                    android:minLines="1"
-                    android:maxLines="1"
-                    android:ellipsize="end"
                     android:layout_marginLeft="8dp"
-                    app:layout_constraintLeft_toLeftOf="parent"
-                    android:layout_marginTop="8dp"
-                    app:layout_constraintTop_toBottomOf="@+id/title_text"
-                    app:layout_constraintRight_toLeftOf="@+id/date_text"
                     android:layout_marginRight="8dp"
-                    app:layout_constraintHorizontal_bias="0.0" />
+                    android:layout_marginTop="8dp"
+                    android:textColor="@color/colorAccent"
+                    android:text="Normal priority"
+                    android:textAlignment="viewStart"
+                    app:layout_constraintLeft_toLeftOf="parent"
+                    app:layout_constraintRight_toLeftOf="@+id/task_date"
+                    app:layout_constraintTop_toBottomOf="@+id/task_status"
+                    app:layout_constraintHorizontal_bias="0.0"
+                    android:layout_marginStart="8dp"
+                    android:layout_marginEnd="8dp" />
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:id="@+id/priority_text"
-                    android:text="Priority"
+                    android:text="12:44 12/12/2017"
+                    app:layout_constraintRight_toRightOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/task_status"
+                    android:layout_marginRight="8dp"
+                    android:layout_marginTop="8dp"
+                    android:id="@+id/task_date"
+                    android:layout_marginEnd="8dp" />
+
+                <TextView
+                    android:id="@+id/extimated"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Estimated:"
+                    android:layout_marginTop="7dp"
+                    app:layout_constraintTop_toBottomOf="@+id/task_priority"
+                    android:layout_marginLeft="8dp"
+                    app:layout_constraintLeft_toLeftOf="parent"
+                    android:layout_marginBottom="8dp"
+                    app:layout_constraintBottom_toTopOf="@+id/subtasks_view"
+                    android:layout_marginStart="8dp" />
+
+                <TextView
+                    android:id="@+id/task_estimated"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
                     android:textStyle="bold"
-                    android:layout_marginRight="8dp"
-                    app:layout_constraintRight_toRightOf="parent"
-                    app:layout_constraintTop_toTopOf="parent"
-                    android:layout_marginTop="8dp" />
+                    android:text="1 H 25 Min"
+                    android:layout_marginTop="7dp"
+                    app:layout_constraintTop_toBottomOf="@+id/task_priority"
+                    android:layout_marginLeft="8dp"
+                    app:layout_constraintLeft_toRightOf="@+id/extimated"
+                    android:layout_marginBottom="8dp"
+                    app:layout_constraintBottom_toTopOf="@+id/subtasks_view"
+                    android:layout_marginStart="8dp" />
 
                 <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="17dp"
-                    android:id="@+id/date_text"
-                    android:gravity="right"
-                    android:textAlignment="gravity"
-                    android:text="12/03/2017 12:34"
-                    android:layout_marginRight="8dp"
-                    app:layout_constraintRight_toRightOf="parent"
-                    android:layout_marginTop="8dp"
-                    app:layout_constraintTop_toBottomOf="@+id/title_text" />
-
-                <TextView
+                    android:textColor="@color/colorAccent"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="this is address and it is looong"
-                    android:id="@+id/address_text"
+                    android:text="Show Subtasks"
                     android:layout_marginRight="8dp"
                     app:layout_constraintRight_toRightOf="parent"
-                    android:layout_marginLeft="8dp"
-                    app:layout_constraintLeft_toLeftOf="parent"
                     android:layout_marginTop="8dp"
-                    app:layout_constraintTop_toBottomOf="@+id/description_text"
-                    app:layout_constraintHorizontal_bias="0.503"
+                    app:layout_constraintTop_toBottomOf="@+id/task_priority"
+                    android:drawableRight="@drawable/menu_down"
+                    android:drawableTint="@color/colorAccent"
+                    android:id="@+id/show_subtasks"
+                    android:layout_marginEnd="8dp" />
+
+
+                <android.support.v7.widget.RecyclerView
+                    android:id="@+id/subtasks_view"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="8dp"
+                    android:layout_marginRight="8dp"
+                    android:layout_marginTop="8dp"
+                    android:visibility="visible"
+                    app:layout_constraintHorizontal_bias="0.0"
+                    app:layout_constraintLeft_toLeftOf="parent"
+                    app:layout_constraintRight_toRightOf="parent"
+                    app:layout_constraintBottom_toTopOf="@+id/address_text"
+                    app:layout_constraintTop_toBottomOf="@+id/show_subtasks"
+                    android:layout_marginStart="8dp"
+                    android:layout_marginEnd="8dp">
+
+                </android.support.v7.widget.RecyclerView>
+
+                <TextView
+                    android:id="@+id/address_text"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    app:layout_constraintLeft_toLeftOf="parent"
+                    app:layout_constraintRight_toRightOf="parent"
                     app:layout_constraintBottom_toBottomOf="parent"
                     android:layout_marginBottom="8dp" />
 
-
-
             </android.support.constraint.ConstraintLayout>
+
 
         </android.support.v7.widget.CardView>
 
@@ -146,10 +200,10 @@
             android:backgroundTint="@color/mdtp_white"
             android:layout_marginRight="8dp"
             app:layout_constraintRight_toRightOf="parent"
-            android:layout_marginTop="8dp"
             android:id="@+id/buttonNavigate"
             app:layout_constraintBottom_toBottomOf="parent"
-            android:layout_marginBottom="8dp" />
+            android:layout_marginBottom="8dp"
+            android:layout_marginEnd="8dp" />
 
     </android.support.constraint.ConstraintLayout>
 

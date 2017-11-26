@@ -1,5 +1,6 @@
 package com.yuschukivan.remindme.mvp.views
 
+import android.content.Intent
 import com.arellomobile.mvp.MvpView
 import com.arellomobile.mvp.viewstate.strategy.SkipStrategy
 import com.arellomobile.mvp.viewstate.strategy.StateStrategyType
@@ -18,5 +19,6 @@ interface MainView: MvpView{
     fun goToNearBy()
     fun askPermissions()
     fun goToTasks()
+    fun goToStatistics(intent: Intent)
 
 }

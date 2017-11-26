@@ -23,6 +23,22 @@ class AssignReminderPresenter: MvpPresenter<AssignReminderView>() {
         viewState.setDateText(time);
         loadedDate = SimpleDateFormat("HH:mm dd/MM/yyyy").parse(time)
         loadButtons(repeats)
+
+        val loadedCal = Calendar.getInstance()
+        loadedCal.time = loadedDate
+
+        val timeCal = Calendar.getInstance()
+        timeCal.clear()
+        timeCal.set(Calendar.HOUR_OF_DAY, loadedCal.get(Calendar.HOUR_OF_DAY))
+        timeCal.set(Calendar.MINUTE, loadedCal.get(Calendar.MINUTE))
+        this.assignedTime = timeCal.time
+
+        val dateCal = Calendar.getInstance()
+        dateCal.clear()
+        dateCal.set(Calendar.MONTH, loadedCal.get(Calendar.MONTH))
+        dateCal.set(Calendar.YEAR, loadedCal.get(Calendar.YEAR))
+        timeCal.set(Calendar.DAY_OF_MONTH, loadedCal.get(Calendar.DAY_OF_MONTH))
+        this.assignedDate = dateCal.time
     }
 
     fun loadButtons(repeats: String) {
@@ -63,13 +79,13 @@ class AssignReminderPresenter: MvpPresenter<AssignReminderView>() {
         calendar.set(Calendar.MINUTE, minute)
         val date = calendar.time
         assignedTime = date
-        val simpleDateFormat = SimpleDateFormat("HH:mm")
-        viewState.setDateText(simpleDateFormat.format(date))
+        val simpleDateFormat = SimpleDateFormat("HH:mm dd/MM/yyyy")
+        viewState.setDateText(simpleDateFormat.format(assignedTime.time + assignedDate.time + 3600000L))
     }
 
     fun onApply() {
         var days = "";
-        buttons.forEach { key, value -> if (value) days += key }
+        buttons.forEach { button -> if (button.value) days += button.key }
         val remindDate = assignedTime.time + assignedDate.time + 3600000L
         val stringDate = SimpleDateFormat("HH:mm dd/MM/yyyy").format(Date(remindDate))
         viewState.finishWithAssign(stringDate, days)
@@ -87,5 +103,9 @@ class AssignReminderPresenter: MvpPresenter<AssignReminderView>() {
                 buttons.put(id,true)
             }
         }
+    }
+
+    fun onDelete() {
+        viewState.finishWithDelete()
     }
 }

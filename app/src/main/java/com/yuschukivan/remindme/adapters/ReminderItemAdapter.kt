@@ -32,29 +32,13 @@ class ReminderItemAdapter(val data: MutableList<Reminder>):
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         holder.titleTextView.text = data[position].title
-        holder.descriptionTextView.text = data[position].description
-        val dateFormat = SimpleDateFormat("dd/MM/yyyy HH:mm")
+        val dateFormat = SimpleDateFormat("HH:mm dd/MM/yyyy")
         holder.dateView.text = dateFormat.format(data[position].date)
         holder.priorityView.text = data[position].priority
         when(data[position].priority) {
             Util.Priority.HIGH -> holder.priorityView.setTextColor(Color.parseColor("#D50000"))
             Util.Priority.NORMAL -> holder.priorityView.setTextColor(Color.parseColor("#f57c00"))
             Util.Priority.LOW -> holder.priorityView.setTextColor(Color.parseColor("#1B5E20"))
-        }
-        if(data[position].mapImage != null ) {
-            holder.mapView.visibility = View.VISIBLE
-            holder.separator.visibility = View.VISIBLE
-            holder.mapView.setImageBitmap(BitmapFactory.decodeByteArray(data[position].mapImage, 0, data[position].mapImage!!.size))
-        } else {
-            holder.mapView.visibility = View.GONE
-            holder.separator.visibility = View.GONE
-            val params = holder.cardView.layoutParams as ViewGroup.MarginLayoutParams
-            val margin = params.topMargin
-            val newparams = LinearLayout.LayoutParams(
-                    LinearLayout.LayoutParams.MATCH_PARENT,
-                    LinearLayout.LayoutParams.WRAP_CONTENT);
-            newparams.setMargins(margin, margin, margin, margin);
-            holder.cardView.layoutParams = newparams
         }
         if(data[position].date.time  < System.currentTimeMillis()) holder.cardView.setCardBackgroundColor(Color.parseColor("#E0E0E0"))
         else holder.cardView.setCardBackgroundColor(Color.WHITE)
@@ -72,11 +56,8 @@ class ReminderItemAdapter(val data: MutableList<Reminder>):
 
                 val cardView = itemView.findViewById(R.id.card_view) as CardView
                 val titleTextView = itemView.findViewById(R.id.title_text) as TextView
-                val descriptionTextView = itemView.findViewById(R.id.description_text) as TextView
                 val dateView = itemView.findViewById(R.id.date_text) as TextView
-                val priorityView = itemView.findViewById(R.id.priority_text) as TextView
-                val mapView = itemView.findViewById(R.id.map_view) as RoundedImageView
-                val separator = itemView.findViewById(R.id.separator) as View
+                val priorityView = itemView.findViewById(R.id.priority_view) as TextView
         }
     }
 }

@@ -2,7 +2,11 @@ package com.yuschukivan.remindme.di
 
 import com.yuschukivan.remindme.di.modules.ContextModule
 import com.yuschukivan.remindme.di.modules.RealmModule
+import com.yuschukivan.remindme.features.calendar.CalendarPresenter
+import com.yuschukivan.remindme.features.nearby.NearByPresenter
+import com.yuschukivan.remindme.features.statistics.StatisticsPresenter
 import com.yuschukivan.remindme.features.task.create.CreateTaskPresenter
+import com.yuschukivan.remindme.features.task.edit.EditTaskPresenter
 import com.yuschukivan.remindme.features.task.list.TasksPresenter
 import com.yuschukivan.remindme.features.task.view.TaskPresenter
 import com.yuschukivan.remindme.mvp.presenters.*
@@ -26,5 +30,7 @@ interface AppComponent {
     fun inject(presenter: TaskPresenter)
     fun inject(presenter: TasksPresenter)
     fun inject(presenter: CreateTaskPresenter)
+    fun inject(presenter: EditTaskPresenter)
+    fun inject(presenter: StatisticsPresenter)
 
 }

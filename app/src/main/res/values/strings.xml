@@ -25,11 +25,14 @@
     <string name="type">Category</string>
     <string name="priority">Priority</string>
     <string name="nothing_for_this_date">Nothing for this date</string>
-    <string name="reminders">REMINDERS</string>
+    <string name="reminders">Reminders</string>
     <string name="remind_on">Remind On:</string>
     <string name="add_category">Add Category</string>
     <string name="delete_category">Delete Category</string>
     <string name="choose_location">Choose Location</string>
     <string name="title_activity_maps">Map</string>
     <string name="google_app_id">remindme-171014</string>
+    <string name="no_subtasks">No Subtasks</string>
+    <string name="hide_subtasks">Hide Subtasks</string>
+    <string name="show_subtasks">Show Subtasks</string>
 </resources>

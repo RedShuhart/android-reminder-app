@@ -2,6 +2,7 @@ package com.yuschukivan.remindme.fragments
 
 import android.content.DialogInterface
 import android.os.Bundle
+import android.support.v7.widget.GridLayoutManager
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
 import android.util.Log
@@ -40,7 +41,7 @@ class FragmentReminders : BaseFragment(), FragmentRemindersView {
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         fragmentView = inflater.inflate(R.layout.fragment_all, container, false)
         recyclerView = fragmentView.findViewById(R.id.recycle_view) as RecyclerView
-        recyclerView.layoutManager = LinearLayoutManager(activity)
+        recyclerView.layoutManager = GridLayoutManager(activity, 2, GridLayoutManager.VERTICAL, false)
         remindAdapter = ReminderItemAdapter()
         recyclerView.adapter = remindAdapter
 

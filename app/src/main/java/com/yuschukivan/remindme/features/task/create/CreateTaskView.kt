@@ -2,6 +2,8 @@ package com.yuschukivan.remindme.features.task.create
 
 import android.graphics.Bitmap
 import com.arellomobile.mvp.MvpView
+import com.arellomobile.mvp.viewstate.strategy.SkipStrategy
+import com.arellomobile.mvp.viewstate.strategy.StateStrategyType
 import com.yuschukivan.remindme.models.Categoty
 
 /**
@@ -17,11 +19,12 @@ interface CreateTaskView: MvpView {
     fun showError(title: String, message: String)
     fun showReminderInfo(time: String, repeats: String)
     fun removeReminderInfo()
-    fun addSubtaskToView(name: String)
-    fun removeSubtaskFromView(name: String)
+    fun addSubtaskToView(names: List<String>)
+    fun removeSubtaskFromView(names: List<String>)
     fun showCreateSubtaskDialog()
     fun setMapImage(bmp: Bitmap)
     fun removeMapImage()
+    @StateStrategyType(SkipStrategy::class)
     fun finishWithOk(position: Int)
-    fun showAssignReminderDialog(date: String, repeats: String)
+    fun showAssignReminderDialog(date: String, repeats: String?, wasAssigned: Boolean)
 }

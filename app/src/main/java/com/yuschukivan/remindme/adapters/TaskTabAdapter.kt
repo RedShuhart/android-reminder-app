@@ -9,9 +9,11 @@ import com.yuschukivan.remindme.models.Categoty
 /**
  * Created by yusch on 15.11.2017.
  */
-class TaskTabAdapter(val fm: FragmentManager, val tabs: MutableList<Categoty>): FragmentStatePagerAdapter(fm), MutableList<Categoty> by tabs {
+class TaskTabAdapter(val fm: FragmentManager, val tabs: MutableList<Categoty>, val filters: MutableList<String>): FragmentStatePagerAdapter(fm), MutableList<Categoty> by tabs {
 
-    constructor(fm: FragmentManager): this(fm, mutableListOf())
+    constructor(fm: FragmentManager): this(fm, mutableListOf(), mutableListOf())
+    constructor(fm: FragmentManager, filters: MutableList<String>): this(fm, mutableListOf(), filters)
+
 
     override fun getCount() = tabs.size + 1
 
@@ -21,7 +23,7 @@ class TaskTabAdapter(val fm: FragmentManager, val tabs: MutableList<Categoty>): 
     }
 
     override fun getItem(position: Int) = when(position) {
-        0 -> TasksFragment.newInstance(position)
-        else -> TasksFragment.newInstance(tabs[position - 1].title, tabs[position - 1].id, position)
+        0 -> TasksFragment.newInstance(position, filters)
+        else -> TasksFragment.newInstance(tabs[position - 1].title, tabs[position - 1].id, position, filters)
     }
 }

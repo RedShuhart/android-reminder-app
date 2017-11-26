@@ -187,48 +187,6 @@
                 app:cardElevation="2dp"
                 app:cardUseCompatPadding="true">
 
-                <android.support.constraint.ConstraintLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content">
-
-                    <TextView
-                        android:id="@+id/textView3"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginLeft="8dp"
-                        android:layout_marginTop="8dp"
-                        android:text="@string/info"
-                        android:textColor="@color/colorAccent"
-                        app:layout_constraintLeft_toLeftOf="parent"
-                        app:layout_constraintTop_toTopOf="parent"
-                        android:layout_marginStart="8dp" />
-
-                    <!--Notes text field-->
-                    <android.support.design.widget.TextInputLayout
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_marginBottom="8dp"
-                        android:layout_marginLeft="8dp"
-                        android:layout_marginRight="8dp"
-                        app:layout_constraintBottom_toBottomOf="parent"
-                        app:layout_constraintLeft_toLeftOf="parent"
-                        app:layout_constraintRight_toRightOf="parent"
-                        app:layout_constraintTop_toBottomOf="@+id/textView3"
-                        android:layout_marginStart="8dp"
-                        android:layout_marginEnd="8dp">
-
-                        <android.support.design.widget.TextInputEditText
-                            android:id="@+id/notesText"
-                            android:layout_width="match_parent"
-                            android:layout_height="match_parent"
-                            android:backgroundTint="@color/colorGrey"
-                            android:hint="@string/add_notes"
-                            android:textColorHint="@color/colorGrey" />
-
-                    </android.support.design.widget.TextInputLayout>
-
-                </android.support.constraint.ConstraintLayout>
-
             </android.support.v7.widget.CardView>
 
             <android.support.v7.widget.CardView
@@ -363,45 +321,6 @@
                     </android.support.constraint.ConstraintLayout>
 
                 </android.support.constraint.ConstraintLayout>
-
-            </android.support.v7.widget.CardView>
-
-            <android.support.v7.widget.CardView
-                android:layout_width="match_parent"
-                android:layout_height="96dp"
-                android:layout_marginTop="1dp"
-                app:cardElevation="2dp"
-                app:cardUseCompatPadding="true">
-
-                <RelativeLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent">
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_centerHorizontal="true"
-                        android:layout_centerVertical="true"
-                        android:text="@string/choose_location"
-                        android:textColor="@color/colorAccent"
-                        android:drawableBottom="@drawable/map_marker_radius"
-                        android:drawableTint="@color/colorAccent"/>
-
-
-                    <ImageView
-                        android:id="@+id/location_pcick"
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:cropToPadding="true"
-                        android:scaleType="centerCrop"
-                        android:src="@null"
-                        android:background="@null"
-                        android:layout_gravity="center"/>
-
-
-
-                </RelativeLayout>
-
 
             </android.support.v7.widget.CardView>
 

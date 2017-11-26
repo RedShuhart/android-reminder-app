@@ -5,6 +5,8 @@ import android.app.Activity
 import android.content.DialogInterface
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.graphics.Color
+import android.graphics.PorterDuff
 import android.os.Bundle
 import android.support.design.widget.FloatingActionButton
 import android.support.design.widget.NavigationView
@@ -17,16 +19,17 @@ import android.support.v7.app.AlertDialog
 import android.support.v7.widget.Toolbar
 import android.view.Menu
 import android.view.MenuItem
+import android.widget.Button
 import android.widget.EditText
 import android.widget.Toast
 import com.arellomobile.mvp.presenter.InjectPresenter
 import com.yuschukivan.remindme.R
 import com.yuschukivan.remindme.activities.*
-import com.yuschukivan.remindme.adapters.TabsAdapter
 import com.yuschukivan.remindme.adapters.TaskTabAdapter
 import com.yuschukivan.remindme.common.utils.find
+import com.yuschukivan.remindme.features.calendar.CalendarActivity
+import com.yuschukivan.remindme.features.nearby.NearByActivity
 import com.yuschukivan.remindme.features.task.create.CreateTaskActivity
-import com.yuschukivan.remindme.features.task.create.CreateTaskView
 import com.yuschukivan.remindme.models.Categoty
 
 /**
@@ -49,9 +52,14 @@ class TaskActivity: BaseActivity(), TaskView {
     val tabLayout by lazy { find<TabLayout>(R.id.tab_layout) }
     val actionButton by lazy {find<FloatingActionButton>(R.id.action_button)}
 
+    val doneButton: Button by lazy {find<Button>(R.id.DONE)}
+    val overdueButton: Button by lazy {find<Button>(R.id.OVERDUE)}
+
     lateinit var drawerLayout: DrawerLayout
     lateinit var toggle: ActionBarDrawerToggle
     lateinit var tabsAdapter: TaskTabAdapter
+
+    val filterButtons = mutableListOf<Button>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         setTheme(R.style.AppDefault)
@@ -60,6 +68,9 @@ class TaskActivity: BaseActivity(), TaskView {
         setSupportActionBar(toolbar)
         supportActionBar!!.setDisplayShowHomeEnabled(true)
         supportActionBar!!.setShowHideAnimationEnabled(true)
+        filterButtons.add(doneButton)
+        filterButtons.add(overdueButton)
+        filterButtons.forEach { it.setOnClickListener { onChooseFiltering(it as Button)  } }
         initNavigationView()
         initTabLayout(0)
     }
@@ -81,6 +92,7 @@ class TaskActivity: BaseActivity(), TaskView {
                 R.id.notification_item -> presenter.onMainActivity()
                 R.id.calendar_item -> presenter.onCalendar()
                 R.id.nearby_item -> presenter.dispatchLocationIntent()
+                R.id.statistics_item -> presenter.onStatistics()
             }
             false
         }
@@ -89,11 +101,20 @@ class TaskActivity: BaseActivity(), TaskView {
     }
 
     fun initTabLayout(position: Int) {
-        tabsAdapter = TaskTabAdapter(supportFragmentManager)
         presenter.loadCategories()
-        viewPager.adapter = tabsAdapter
         tabLayout.setupWithViewPager(viewPager)
         viewPager.setCurrentItem(position, true)
+        tabLayout.addOnTabSelectedListener(object: TabLayout.OnTabSelectedListener{
+            override fun onTabReselected(tab: TabLayout.Tab) {
+            }
+
+            override fun onTabUnselected(tab: TabLayout.Tab) {
+            }
+
+            override fun onTabSelected(tab: TabLayout.Tab) {
+                presenter.saveCurrentTab(tab.position)
+            }
+        })
     }
 
 
@@ -132,7 +153,7 @@ class TaskActivity: BaseActivity(), TaskView {
                     })
                     builder.show()
                 } else {
-                    builder.setMessage("Do you want to delete " + title + " category?")
+                    builder.setMessage("Do you want to delete $title category?")
                     builder.setPositiveButton("Delete",
                             DialogInterface.OnClickListener { dialog, which ->
                                 presenter.onDeleteCategory(tabsAdapter[viewPager.currentItem - 1])
@@ -159,9 +180,11 @@ class TaskActivity: BaseActivity(), TaskView {
         return true
     }
 
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent) {
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         if (requestCode == CREATE_TASK_REQUEST) {
-            if(resultCode == Activity.RESULT_OK) viewPager.setCurrentItem(data.getIntExtra("position", 0))
+            if(resultCode == Activity.RESULT_OK) {
+                data?.let { viewPager.currentItem = data.getIntExtra("position", 0)}
+            }
         }
     }
 
@@ -179,18 +202,22 @@ class TaskActivity: BaseActivity(), TaskView {
     }
 
     override fun goToMain() {
-        finish()
         startActivity(Intent(this, MainActivity::class.java))
+        finish()
     }
 
-    override fun updateTabsAdapter(categories: List<Categoty>) {
-        tabsAdapter.clear()
+    override fun goToStatistics(intent: Intent) {
+        startActivity(intent)
+    }
+
+    override fun updateTabsAdapter(categories: List<Categoty>, filters: MutableList<String>, deleted: Boolean) {
+        tabsAdapter = TaskTabAdapter(supportFragmentManager, filters)
         tabsAdapter.addAll(categories)
         tabsAdapter.notifyDataSetChanged()
         viewPager.adapter = tabsAdapter
+        if(deleted) viewPager.currentItem = 0
+            else viewPager.currentItem = presenter.currentTab
     }
-
-
 
     companion object {
         private val ALL_NOTIFICATIONS = 0
@@ -228,5 +255,24 @@ class TaskActivity: BaseActivity(), TaskView {
                 return
             }
         }
+    }
+
+    override fun highLight(id: Int, enable: Boolean) {
+        val btn = findViewById(id) as Button
+        if (enable) {
+            btn.setTextColor(Color.parseColor("#006064"))
+            val color = Color.parseColor("#006064");
+            val mode = PorterDuff.Mode.SRC_ATOP;
+            btn.compoundDrawables[1].setColorFilter(color,mode)
+        } else {
+            btn.setTextColor(Color.parseColor("#A1A1A1"))
+            val color = Color.parseColor("#A1A1A1");
+            val mode = PorterDuff.Mode.SRC_ATOP;
+            btn.compoundDrawables[1].setColorFilter(color,mode)
+        }
+    }
+
+    fun onChooseFiltering(myButton: Button) {
+        presenter.setFilter(myButton.id)
     }
 }

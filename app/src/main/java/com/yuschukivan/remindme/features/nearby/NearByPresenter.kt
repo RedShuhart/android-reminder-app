@@ -1,8 +1,7 @@
-package com.yuschukivan.remindme.mvp.presenters
+package com.yuschukivan.remindme.features.nearby
 
 import android.content.Context
 import com.arellomobile.mvp.MvpPresenter
-import com.yuschukivan.remindme.mvp.views.NearByView
 import io.realm.Realm
 import javax.inject.Inject
 import android.location.Criteria
@@ -16,12 +15,12 @@ import com.arellomobile.mvp.InjectViewState
 import com.google.android.gms.maps.model.*
 import com.yuschukivan.remindme.RemindApp
 import com.yuschukivan.remindme.common.utils.Util
-import com.yuschukivan.remindme.models.Reminder
-import com.yuschukivan.remindme.models.ReminderLocationPair
 import java.lang.Math.*
 import android.content.Intent
-
-
+import com.yuschukivan.remindme.features.task.edit.EditTaskActivity
+import com.yuschukivan.remindme.models.*
+import com.yuschukivan.remindme.services.NotificationReceiver
+import java.util.*
 
 
 /**
@@ -42,16 +41,15 @@ class NearByPresenter @Inject constructor():  MvpPresenter<NearByView>() {
 
     var myLongitude: Double = 0.0
     var myLatitude: Double = 0.0
-    lateinit var closeReminders: MutableList<ReminderLocationPair>
+    lateinit var closeTasks: MutableList<TaskLocationPair>
+    var subtasksShown = false
+
+    lateinit var subtasksList: MutableList<SubTask>
+    lateinit var taskShown: Task
 
     fun onMapLoad() {
         loadNearByReminders()
-        viewState.showMarkers(closeReminders)
-    }
-
-    fun onReminderInfo(id: String) {
-        val reminder = closeReminders.find { it.reminder.id == id.toLong() }
-        viewState.showInfo(reminder!!.reminder)
+        viewState.showMarkers(closeTasks)
     }
 
     fun getCurrentLocation( ) {
@@ -62,14 +60,57 @@ class NearByPresenter @Inject constructor():  MvpPresenter<NearByView>() {
         }
     }
 
+    fun onTaskInfo(id: String) {
+        taskShown = realm.where(Task::class.java).equalTo("id", id.toLong()).findFirst()
+        subtasksList = mutableListOf()
+        subtasksList.addAll(taskShown.subTasks)
+        viewState.showInfo(taskShown)
+        viewState.updateSubtasksView(subtasksList)
+    }
+
+    fun onTaskInfo() {
+        subtasksList = mutableListOf()
+        subtasksList.addAll(taskShown.subTasks)
+        viewState.showInfo(taskShown)
+        viewState.updateSubtasksView(subtasksList)
+    }
+
+    fun completesSubtask(subtaskId: Long, position: Int) {
+
+        realm.executeTransaction {
+            val subtask = realm.where(SubTask::class.java).equalTo("id", subtaskId).findFirst()
+            subtask.completed = !subtask.completed
+            updateSubtasks(taskShown)
+        }
+    }
+
+    fun updateSubtasks(task: Task) {
+        viewState.updateSubtasksView(task.subTasks)
+    }
+
+    fun showSubtasks(task: Task) {
+        if(task.subTasks.isNotEmpty()) {
+            subtasksShown = !subtasksShown
+            viewState.showSubtasks()
+        }
+    }
+
+    fun hideSubtasks(task: Task) {
+        subtasksShown = !subtasksShown
+        viewState.hideSubtasks()
+    }
+
+
     private fun loadNearByReminders() {
-        closeReminders = mutableListOf()
-        val reminders = realm.where(Reminder::class.java).findAll()
-        reminders.forEach { reminder ->
-            val longLat = reminder.latLong.split(",")
-            val reminderLat = longLat[0].toDouble()
-            val reminderLong = longLat[1].toDouble()
-            closeReminders.add(ReminderLocationPair(reminder, createMarker(reminderLat, reminderLong, reminder.id, reminder.priority)))
+        closeTasks = mutableListOf()
+        val tasks = realm.where(Task::class.java).findAll()
+        tasks.forEach { task ->
+            task.latLong?.let {
+                val longLat = it.split(",")
+                val reminderLat = longLat[0].toDouble()
+                val reminderLong = longLat[1].toDouble()
+                closeTasks.add(TaskLocationPair(task, createMarker(reminderLat, reminderLong, task.id, task.priority)))
+            }
         }
     }
 
@@ -136,4 +177,47 @@ class NearByPresenter @Inject constructor():  MvpPresenter<NearByView>() {
         mapIntent.`package` = "com.google.android.apps.maps"
         context.startActivity(mapIntent);
     }
+
+    fun onEditTask(task: Task) {
+        val intent = Intent(context, EditTaskActivity::class.java)
+        intent.putExtra("task_id", task.id)
+        viewState.startEditing(intent)
+    }
+
+    fun onDeleteTask(task: Task) {
+        realm.executeTransaction {
+            task.reminder?.let {
+                val notifications = it.notifications.split(" ")
+                for(notification in notifications) {
+                    if (notification.isNotEmpty()) {
+                        NotificationReceiver.Companion.removeNotification(context, notification)
+                    }
+                }
+                it.deleteFromRealm()
+            }
+            task.deleteFromRealm()
+            viewState.hideInfo()
+        }
+    }
+
+    fun onDoneTask(task: Task) {
+        realm.executeTransaction {
+            task.doneDate = Calendar.getInstance().time
+            viewState.setStateIcon(task)
+        }
+    }
+
+    fun onUndoTask(task: Task) {
+        realm.executeTransaction {
+            task.doneDate = null
+            viewState.setStateIcon(task)
+        }
+    }
+
+    fun onShowActions(): Boolean {
+        viewState.showActionsDialog(taskShown)
+        return true
+    }
+
+
 }

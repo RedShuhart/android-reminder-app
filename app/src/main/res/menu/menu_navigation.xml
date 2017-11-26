@@ -16,5 +16,10 @@
         android:title="Near By"
         android:orderInCategory="2"
         android:icon="@drawable/map_marker_radius"/>
+    <item
+        android:id="@+id/statistics_item"
+        android:title="Statistics"
+        android:orderInCategory="2"
+        android:icon="@drawable/chart_line"/>
 
 </menu>

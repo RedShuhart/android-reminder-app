@@ -17,7 +17,6 @@ interface RemindDialogView: MvpView {
     fun  updateCategoriesSpinner(data: MutableList<Categoty>)
     fun  addButton(index: String, day: String)
     fun  highLight(id: Int, enable: Boolean)
-    fun  setMapImage(bmp: Bitmap)
     fun showApply()
     fun  setTypeSpinner(position: Int)
     fun  showError(s: String)

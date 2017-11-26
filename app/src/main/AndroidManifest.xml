@@ -17,20 +17,25 @@ package="com.yuschukivan.remindme">
     </activity>
     <activity android:name=".activities.MainActivity" android:theme="@style/AppTheme"
         android:screenOrientation="portrait" />
-    <activity android:name=".activities.CalendarActivity" android:theme="@style/AppTheme"
+    <activity android:name=".features.calendar.CalendarActivity" android:theme="@style/AppTheme"
         android:screenOrientation="portrait" />
     <activity android:name=".activities.AddReminderActivity" android:theme="@style/AppTheme"
         android:screenOrientation="portrait" />
     <activity android:name=".features.task.view.TaskActivity" android:theme="@style/AppTheme"
         android:screenOrientation="portrait" />
+    <activity android:name=".features.task.edit.EditTaskActivity" android:theme="@style/AppTheme"
+        android:screenOrientation="portrait" />
+    <activity android:name=".features.statistics.StatisticsActivity" android:theme="@style/AppTheme"
+        android:screenOrientation="portrait" />
     <activity android:name=".features.task.create.CreateTaskActivity" android:theme="@style/AppTheme"
         android:screenOrientation="portrait" />
     <activity
         android:name="com.yuschukivan.remindme.activities.MapsActivity"
+        android:screenOrientation="portrait"
         android:label="@string/title_activity_maps">
     </activity>
     <activity
-        android:name="com.yuschukivan.remindme.activities.NearByActivity"/>
+        android:name="com.yuschukivan.remindme.features.nearby.NearByActivity"/>
 
     <receiver android:name=".services.NotificationReceiver" />
 

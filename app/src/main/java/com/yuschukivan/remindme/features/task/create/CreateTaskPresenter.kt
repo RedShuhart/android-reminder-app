@@ -43,10 +43,10 @@ class CreateTaskPresenter @Inject constructor() : MvpPresenter<CreateTaskView>()
     }
 
 
-    lateinit var taskTime: Date
-    lateinit var taskDate: Date
-    var taskEstTime: Int = 0
-    var reminderRepeatOn: String = ""
+    var taskTime: Date? = null
+    var taskDate: Date? = null
+    var taskEstTime: Int? = null
+    var reminderRepeatOn: String? = null
     var reminderDate: Date? = null
     var fragmentPosition: Int = 0
     var mapBitmap: Bitmap? = null
@@ -69,18 +69,35 @@ class CreateTaskPresenter @Inject constructor() : MvpPresenter<CreateTaskView>()
             viewState.showError("Task", "Please Enter Name")
             return
         }
+        if(taskDate == null) {
+            viewState.showError("Task", "Please Enter Due Date")
+            return
+        }
         realm.executeTransaction {
             val task = realm.createObject(Task::class.java, System.currentTimeMillis())
             task.name = name
             task.description = notes
-            task.dueDate = Date(taskDate.time + taskTime.time + 3600000L)
+
+            taskTime?.let { time ->
+                taskDate?.let { date ->
+                    task.dueDate = Date(date.time + time.time + 3600000L)
+                }
+            }
+
             task.priority = taskPriority
             task.category = taskCategory
+
+            reminderDate?.let {
+                task.reminder = createReminder(name, it, reminderRepeatOn!!, notes)
+            }
             subtasksList.forEach { name ->
                 val subtask = realm.createObject(SubTask::class.java, Random().nextInt())
                 subtask.description = name
                 subtask.completed = false
                 task.subTasks.add(subtask)
+            }
+            taskEstTime?.let {
+                task.estimatedTime = taskEstTime
             }
             latLong?.let {
                 task.latLong = it
@@ -113,7 +130,7 @@ class CreateTaskPresenter @Inject constructor() : MvpPresenter<CreateTaskView>()
 
         Util.Days.WEEKDAYS.forEachIndexed { index, day ->
             if(selectedDays.contains(index.toString())){
-                displaySelected += "<font color='#1B5E20' size='15'>$day </font>"
+                displaySelected += "<b><font color='#1B5E20' size='18'>$day </font></b>"
             }
             else {
                 displaySelected += "<font size='14'>$day </font>"
@@ -121,12 +138,17 @@ class CreateTaskPresenter @Inject constructor() : MvpPresenter<CreateTaskView>()
         }
         viewState.showReminderInfo(time, displaySelected);
     }
+    fun onDeleteReminder() {
+        reminderRepeatOn = null
+        reminderDate = null
+        viewState.removeReminderInfo()
+    }
 
     fun onAssignReminder() {
         var passedTime = ""
         passedTime = simpledateFormat.format(Calendar.getInstance().time)
         reminderDate?.let { passedTime = simpledateFormat.format(it) }
-        viewState.showAssignReminderDialog(passedTime, reminderRepeatOn)
+        viewState.showAssignReminderDialog(passedTime, reminderRepeatOn, reminderDate != null)
     }
 
     fun onDateChoosen(year: Int, monthOfYear: Int, dayOfMonth: Int) {
@@ -147,8 +169,12 @@ class CreateTaskPresenter @Inject constructor() : MvpPresenter<CreateTaskView>()
         calendar.set(Calendar.MINUTE, minute)
         val date = calendar.time
         taskTime = date
-        val dateToShow = SimpleDateFormat("HH:mm dd/MM/yyyy").format(Date(taskDate.time + taskTime.time + 3600000L))
-        viewState.setDateText(dateToShow)
+        taskTime?.let { time ->
+            taskDate?.let { date ->
+                val dateToShow = SimpleDateFormat("HH:mm dd/MM/yyyy").format(Date(date.time + time.time + 3600000L))
+                viewState.setDateText(dateToShow)
+            }
+        }
     }
 
     fun onEstChosen(hourOfDay: Int, minute: Int) {
@@ -172,12 +198,12 @@ class CreateTaskPresenter @Inject constructor() : MvpPresenter<CreateTaskView>()
             return
         }
         subtasksList.add(name)
-        viewState.addSubtaskToView(name)
+        viewState.addSubtaskToView(subtasksList)
     }
 
     fun onRemoveSubtask(query: String) {
         subtasksList.remove(query)
-        viewState.removeSubtaskFromView(query)
+        viewState.removeSubtaskFromView(subtasksList)
     }
 
     fun onShowChooseDate() {
@@ -191,7 +217,7 @@ class CreateTaskPresenter @Inject constructor() : MvpPresenter<CreateTaskView>()
     fun onLocationSelected(place: Place) {
         async {
             address = place.address.toString()
-            val url = URL("https://maps.googleapis.com/maps/api/staticmap?center=${place.latLng.latitude},${place.latLng.longitude}&zoom=15&size=850x200&markers=color:red%7C${place.latLng.latitude},${place.latLng.longitude}")
+            val url = URL("https://maps.googleapis.com/maps/api/staticmap?center=${place.latLng.latitude},${place.latLng.longitude}&zoom=15&size=850x200&markers=color:blue%7C${place.latLng.latitude},${place.latLng.longitude}")
             mapBitmap = await { BitmapFactory.decodeStream(url.openConnection().getInputStream()) }
             latLong = place.latLng.latitude.toString() + "," + place.latLng.longitude.toString()
             viewState.setMapImage(mapBitmap!!)
@@ -227,5 +253,29 @@ class CreateTaskPresenter @Inject constructor() : MvpPresenter<CreateTaskView>()
         timeCal.set(Calendar.DAY_OF_MONTH, Calendar.getInstance().get(Calendar.DAY_OF_MONTH))
         val date = timeCal.time
         taskDate = date
+    }
+
+    private fun createReminder(name: String, date: Date, repeats: String, notes: String): Reminder {
+        val reminder = realm.createObject(Reminder::class.java, System.currentTimeMillis())
+        reminder.notifications = ""
+        reminder.title = "Assigned to: " + name
+        reminder.date = date
+        reminder.priority = taskPriority
+        reminder.type = taskCategory.title
+        reminder.category = taskCategory
+        reminder.selectedDays = ""
+
+        val notifId = Util.NotificationUtil.generateNotification(context, name, notes, date.time, Random().nextInt())
+        Log.d("NotificationPresenter", "id: " + notifId)
+        if(notifId != -1) reminder.notifications += "" + notifId
+        reminderRepeatOn?.let { repeat ->
+            Util.Days.WEEKDAYS.forEachIndexed { index, day ->
+                if(repeat.contains(index.toString())){
+                    reminder.notifications += " " + Util.NotificationUtil.generateNotificationRepeat(context, name, notes, index, Random().nextInt())
+                    reminder.selectedDays += index.toString()
+                }
+            }
+        }
+        return reminder
     }
 }

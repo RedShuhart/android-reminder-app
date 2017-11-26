@@ -8,10 +8,12 @@ import android.graphics.Bitmap
 import android.graphics.Typeface
 import android.os.Bundle
 import android.support.v7.app.AlertDialog
+import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
 import android.support.v7.widget.Toolbar
 import android.text.Html
 import android.text.format.DateFormat
+import android.util.Log
 import android.view.View
 import android.widget.*
 import co.metalab.asyncawait.async
@@ -71,6 +73,7 @@ class CreateTaskActivity: BaseActivity(), CreateTaskView, AdapterView.OnItemSele
     val reminderTime by lazy { find<TextView>(R.id.reminder_time) }
     val reminderRepeats by lazy { find<TextView>(R.id.reminder_repeats) }
     val subtasksView by lazy {find<RecyclerView>(R.id.subtasks_list)}
+    val chooseLocationText by lazy {find<TextView>(R.id.choose_location_text) }
 
     val priorityCategories: List<String> = ArrayList<String>().apply {
         add(Util.Priority.LOW)
@@ -116,6 +119,8 @@ class CreateTaskActivity: BaseActivity(), CreateTaskView, AdapterView.OnItemSele
 
         typeAdapter = ArrayAdapter<Categoty>(this, android.R.layout.simple_spinner_item, mutableListOf())
         subtasksAdapter = SubtaskListItemAdapter()
+        subtasksView.layoutManager = LinearLayoutManager(applicationContext)
+        subtasksView.adapter = subtasksAdapter
 
         presenter.getCategories()
 
@@ -258,11 +263,15 @@ class CreateTaskActivity: BaseActivity(), CreateTaskView, AdapterView.OnItemSele
         alert.show()
     }
 
-    override fun showAssignReminderDialog(date: String, repeats: String) {
-        val dialog =  AssignReminderDialog.newInstance(date, repeats)
+    override fun showAssignReminderDialog(date: String, repeats: String?, wasAssigned: Boolean) {
+        val dialog =  AssignReminderDialog.newInstance(date, repeats, wasAssigned)
         dialog.assigns.observeOn(AndroidSchedulers.mainThread())
                 .subscribe { query ->
                     presenter.onAddReminder(query.date, query.repeats)
+                }.unsubscribeOnDestroy()
+        dialog.deletes.observeOn(AndroidSchedulers.mainThread())
+                .subscribe { query ->
+                    presenter.onDeleteReminder()
                 }.unsubscribeOnDestroy()
         dialog.show(fragmentManager, "TAG")
     }
@@ -284,14 +293,20 @@ class CreateTaskActivity: BaseActivity(), CreateTaskView, AdapterView.OnItemSele
     }
 
 
-    override fun addSubtaskToView(name: String) {
+    override fun addSubtaskToView(names: List<String>) {
         subtasksView.visibility = View.VISIBLE
-        subtasksAdapter.add(name)
-        subtasksAdapter.notifyItemChanged(subtasksAdapter.size - 1)
+        subtasksAdapter.clear()
+        subtasksAdapter.addAll(names)
+        subtasksAdapter.notifyDataSetChanged()
+        Log.d("TaskCreator", subtasksAdapter.size.toString())
+        Log.d("TaskCreator", names.size.toString())
+        Log.d("TaskCreator", subtasksAdapter[0])
     }
 
-    override fun removeSubtaskFromView(name: String) {
-        subtasksAdapter.remove(name)
+    override fun removeSubtaskFromView(names: List<String>) {
+        subtasksAdapter.clear()
+        subtasksAdapter.addAll(names)
+        subtasksAdapter.notifyDataSetChanged()
         if(subtasksAdapter.isEmpty()) subtasksView.visibility = View.GONE
         subtasksAdapter.notifyDataSetChanged()
     }
@@ -314,6 +329,8 @@ class CreateTaskActivity: BaseActivity(), CreateTaskView, AdapterView.OnItemSele
 
     override fun setMapImage(bmp: Bitmap) {
         mapImage.setImageBitmap(bmp)
+        mapImage.visibility = View.VISIBLE
+        chooseLocationText.visibility = View.GONE
         addMapButton.setOnClickListener { presenter.onRemoveMap() }
         addMapButton.setImageResource(R.drawable.close)
         mapImage.setOnClickListener {
@@ -324,6 +341,8 @@ class CreateTaskActivity: BaseActivity(), CreateTaskView, AdapterView.OnItemSele
 
     override fun removeMapImage() {
         mapImage.setImageBitmap(null)
+        mapImage.visibility = View.GONE
+        chooseLocationText.visibility = View.VISIBLE
         addMapButton.setOnClickListener {
             val builder = PlacePicker.IntentBuilder()
             startActivityForResult(builder.build(this), PLACE_PICKER_REQUEST);

@@ -63,6 +63,56 @@
             android:src="@drawable/plus"
             app:backgroundTint="@color/colorAccent" />
 
+        <LinearLayout
+            android:id="@+id/filters"
+            android:background="@color/mdtp_white"
+            app:layout_insetEdge="bottom"
+            android:layout_gravity="bottom"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:background="@color/colorAccent">
+
+            </View>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingTop="2dp">
+                <Button
+                    android:id="@+id/OVERDUE"
+                    android:layout_weight="1"
+                    android:background="@null"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:drawableTop="@drawable/alert_circle_outline"
+                    android:drawableTint="@color/colorDarkGrey"
+                    android:textColor="@color/colorDarkGrey"
+                    android:text="Overdue"
+                    android:textAllCaps="false"
+                    android:textStyle="normal"/>
+
+                <Button
+                    android:id="@+id/DONE"
+                    android:layout_weight="1"
+                    android:background="@null"
+                    android:textAllCaps="false"
+                    android:textColor="@color/colorDarkGrey"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:drawableTop="@drawable/calendar_check"
+                    android:drawableTint="@color/colorDarkGrey"
+                    android:text="Done"/>
+            </LinearLayout>
+
+
+
+        </LinearLayout>
+
     </android.support.design.widget.CoordinatorLayout>
 
     <android.support.design.widget.NavigationView

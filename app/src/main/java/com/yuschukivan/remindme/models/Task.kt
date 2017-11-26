@@ -14,12 +14,13 @@ open class Task(
         var name: String = "",
         var description: String ="",
         var dueDate: Date? = null,
+        var doneDate: Date? = null,
         var priority: String = "",
         var estimatedTime: Int? = null,
         var reminder: Reminder? = null,
         var subTasks: RealmList<SubTask> = RealmList(),
         var mapImage: ByteArray? = null,
         var category: Categoty? = null,
-        var latLong: String = "",
-        var address: String = ""
+        var latLong: String? = null,
+        var address: String? = null
 ): RealmObject() {}

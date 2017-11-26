@@ -52,20 +52,11 @@ class RemindDialogPresenter : MvpPresenter<RemindDialogView>() {
     var priorityChanged = false
     var tempReminder = Reminder()
     var fragmentPosition = 0
-    var mapBitmap: Bitmap? = null
-    var latLong: String? = null
-    var address: String? = null
 
 
     fun loadButtons(id: Long) {
 
         val reminder = realm.where(Reminder::class.java).equalTo("id", id).findFirst()
-
-        if(reminder.mapImage != null) {
-            mapBitmap = (BitmapFactory.decodeByteArray(reminder.mapImage, 0, reminder.mapImage!!.size))
-            address = reminder.address
-            latLong = reminder.latLong
-        }
 
         val cal = Calendar.getInstance()
         cal.time = (reminder.date)
@@ -198,18 +189,7 @@ class RemindDialogPresenter : MvpPresenter<RemindDialogView>() {
         fragmentPosition = position + 1
     }
 
-    fun  onLocationSelected(place: Place) {
-        async {
-            val url = URL("https://maps.googleapis.com/maps/api/staticmap?center=${place.latLng.latitude},${place.latLng.longitude}&zoom=15&size=850x200&markers=color:red%7C${place.latLng.latitude},${place.latLng.longitude}")
-            mapBitmap = await { BitmapFactory.decodeStream(url.openConnection().getInputStream()) }
-            latLong = place.latLng.latitude.toString() + "," + place.latLng.longitude.toString()
-            address = place.address.toString()
-            viewState.setMapImage(mapBitmap!!)
-            viewState.showApply()
-        }
-    }
-
-    fun onApply(id: Long, nameInput: String, noteInput: String) {
+    fun onApply(id: Long, nameInput: String) {
         if(nameInput.isEmpty()) {
             viewState.showError("Please Enter Name")
             return
@@ -218,40 +198,20 @@ class RemindDialogPresenter : MvpPresenter<RemindDialogView>() {
             val reminder = realm.where(Reminder::class.java).equalTo("id", id).findFirst()
             reminder.notifications = ""
             reminder.title = nameInput
-            reminder.description = noteInput
             if(dateChanged) reminder.date = Date(date.time + time.time + 3600000L)
             if(typeCahnged) reminder.priority = tempReminder.priority
             if(priorityChanged) reminder.type = tempReminder.type
             reminder.category = tempReminder.category
             reminder.selectedDays = ""
-            if(latLong != null) reminder.latLong = latLong!!
-            if(address != null) reminder.address = address!!
-            if(mapBitmap != null) {
-                val stream = ByteArrayOutputStream()
-                mapBitmap!!.compress(Bitmap.CompressFormat.PNG, 100, stream)
-                reminder.mapImage = stream.toByteArray()
-            }
-            val notifId = Util.NotificationUtil.generateNotification(context, nameInput, noteInput, date.time + time.time + 3600000L, Random().nextInt())
+            val notifId = Util.NotificationUtil.generateNotification(context, nameInput, "", date.time + time.time + 3600000L, Random().nextInt())
             if(notifId != -1) reminder.notifications += " " + notifId
-            buttons.forEach { day, value ->
-                if(value) {
-                    reminder.notifications += " " + Util.NotificationUtil.generateNotificationRepeat(context, nameInput, noteInput, day, Random().nextInt())
-                    reminder.selectedDays += day.toString()
+            buttons.forEach {
+                if(it.value) {
+                    reminder.notifications += " " + Util.NotificationUtil.generateNotificationRepeat(context, nameInput, "", it.key, Random().nextInt())
+                    reminder.selectedDays += it.key.toString()
                 }
             }
             viewState.close()
         }
     }
-
-    fun  onMap(id: Long) {
-        val reminder = realm.where(Reminder::class.java).equalTo("id", id).findFirst()
-        val intent = Intent(context, MapsActivity::class.java)
-        intent.putExtra("name", reminder.title)
-        intent.putExtra("address", address)
-        val latLng = latLong!!.split(",")
-        intent.putExtra("lat", latLng[0].toDouble())
-        intent.putExtra("long", latLng[1].toDouble())
-        viewState.goToActivity(intent)
-    }
-
 }

@@ -8,8 +8,7 @@ import android.support.v4.content.ContextCompat
 import com.arellomobile.mvp.InjectViewState
 import com.arellomobile.mvp.MvpPresenter
 import com.yuschukivan.remindme.RemindApp
-import com.yuschukivan.remindme.activities.NearByActivity
-import com.yuschukivan.remindme.common.utils.RealmConfig
+import com.yuschukivan.remindme.features.statistics.StatisticsActivity
 import com.yuschukivan.remindme.models.Categoty
 import com.yuschukivan.remindme.models.Reminder
 import com.yuschukivan.remindme.mvp.views.MainView
@@ -112,5 +111,10 @@ class MainPresenter: MvpPresenter<MainView>(){
 
     fun onTasks() {
         viewState.goToTasks()
+    }
+
+    fun onStatistics() {
+        val intent = Intent(context, StatisticsActivity::class.java)
+        viewState.goToStatistics(intent)
     }
 }

@@ -22,33 +22,30 @@ import android.graphics.Paint.STRIKE_THRU_TEXT_FLAG
 /**
  * Created by yusch on 05.11.2017.
  */
-class SubtaskItemAdapter(val data: MutableList<SubTask>):
+class SubtaskItemAdapter(val data: MutableList<SubTask>, val checkWithId: (Long, Int) -> Unit):
         RecyclerView.Adapter<SubtaskItemAdapter.Companion.ViewHolder>(), MutableList<SubTask> by data {
 
-    val checks = PublishSubject.create<Long>()
-
-    constructor(): this(mutableListOf())
+    constructor(checkWithId: (Long, Int) -> Unit): this(mutableListOf(), checkWithId)
 
     override fun onBindViewHolder(holder: SubtaskItemAdapter.Companion.ViewHolder, position: Int) {
         val subtask = data[position]
 
         holder.title.text = subtask.description
-        when {
-            subtask.completed -> holder.title.paintFlags = holder.title.getPaintFlags() or Paint.STRIKE_THRU_TEXT_FLAG
-            else -> holder.title.paintFlags = Paint.STRIKE_THRU_TEXT_FLAG or Paint.ANTI_ALIAS_FLAG
+        when (subtask.completed){
+            true -> {
+                holder.title.paintFlags = holder.title.getPaintFlags() or Paint.STRIKE_THRU_TEXT_FLAG
+            }
+            else -> holder.title.paintFlags = holder.title.getPaintFlags() and Paint.STRIKE_THRU_TEXT_FLAG.inv()
         }
 
         holder.checkBox.isChecked = subtask.completed
         holder.checkBox.setOnCheckedChangeListener(CompoundButton.OnCheckedChangeListener { buttonView, isChecked ->
-            when {
-                isChecked -> checks.onNext(subtask.id)
-                else -> checks.onNext(subtask.id)
-            }
+            checkWithId(subtask.id, position)
         })
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): SubtaskItemAdapter.Companion.ViewHolder {
-        val view = LayoutInflater.from(parent.context).inflate(R.layout.remind_item, parent, false)
+        val view = LayoutInflater.from(parent.context).inflate(R.layout.subtask_item, parent, false)
         return SubtaskItemAdapter.Companion.ViewHolder(view)
     }
 

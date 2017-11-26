@@ -118,6 +118,10 @@ class Util {
         val HISTORY: String = "HISTORY"
     }
 
+    object Filters {
+        val TYPE = arrayOf("OVERDUE", "DONE")
+    }
+
     object Priority {
         val LOW: String = "Low"
         val NORMAL: String ="Normal"

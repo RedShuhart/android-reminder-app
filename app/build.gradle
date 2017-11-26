@@ -82,6 +82,7 @@ dependencies {
     compile "com.arello-mobile:moxy-app-compat:$moxy_version"
     kapt "com.arello-mobile:moxy-compiler:$moxy_version"
 
+    compile 'com.github.PhilJay:MPAndroidChart:v3.0.2'
     compile 'com.makeramen:roundedimageview:2.3.0'
     compile 'com.google.android.gms:play-services-location:8.4.0'
     compile 'com.github.sundeepk:compact-calendar-view:2.0.2'
