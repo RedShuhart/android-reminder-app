@@ -68,6 +68,7 @@ class TaskItemAdapter(val context: Context, val data: MutableList<TaskShownPair>
         holder.titleTextView.text = taskPair.task.name
         //holder.descriptionTextView.text = taskPair.task.description
         holder.priorityView.text = taskPair.task.priority
+        holder.estimatedView.text = "────"
         taskPair.task.estimatedTime?.let {
             holder.estimatedView.text = "${it / 60} H ${it % 60} Min"
         }
@@ -85,6 +86,9 @@ class TaskItemAdapter(val context: Context, val data: MutableList<TaskShownPair>
             (taskPair.task.dueDate!!.time < Calendar.getInstance().time.time &&  taskPair.task.doneDate == null) -> {
                 holder.taskStatus.setBackgroundResource(R.drawable.alert_circle_outline)
                 holder.taskStatus.setColorFilter(Color.parseColor("#D50000"))
+            }
+            (taskPair.task.doneDate != null && taskPair.task.doneDate!!.time > taskPair.task.dueDate!!.time) -> {
+                holder.taskStatus.setBackgroundResource(R.drawable.calendar_check_yellow)
             }
             taskPair.task.doneDate != null -> {
                 holder.taskStatus.setBackgroundResource(R.drawable.calendar_check)

@@ -48,10 +48,11 @@ class FragmentReminders : BaseFragment(), FragmentRemindersView {
         recyclerView.addOnItemTouchListener(
                 RecycleItemClickListener(activity, recyclerView, object: RecycleItemClickListener.OnItemClickListener {
                     override fun onItemClick(view: View, position: Int) {
-                        presenter.onRemindClick(remindAdapter[position])
                     }
 
-                    override fun onLongItemClick(view: View, position: Int) {}
+                    override fun onLongItemClick(view: View, position: Int) {
+                        presenter.onRemindClick(remindAdapter[position])
+                    }
                 }))
 
         return fragmentView

@@ -34,6 +34,7 @@ class RemindCalendarItemAdapter(val data: MutableList<Reminder>):
         holder.titleTextView.text = data[position].title
         val dateFormat = SimpleDateFormat("dd/MM/yyyy HH:mm")
         holder.dateView.text = dateFormat.format(data[position].date)
+        holder.priorityView.text = "Priority: ${data[position].priority}"
         when(data[position].priority) {
             Util.Priority.HIGH -> holder.priorityView.setTextColor(Color.parseColor("#D50000"))
             Util.Priority.NORMAL -> holder.priorityView.setTextColor(Color.parseColor("#f57c00"))

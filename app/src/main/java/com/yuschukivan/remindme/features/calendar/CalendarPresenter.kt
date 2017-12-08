@@ -3,6 +3,7 @@ package com.yuschukivan.remindme.features.calendar
 import android.content.Context
 import android.content.Intent
 import android.graphics.Color
+import android.util.Log
 import com.arellomobile.mvp.InjectViewState
 import com.arellomobile.mvp.MvpPresenter
 import com.github.sundeepk.compactcalendarview.domain.Event
@@ -10,6 +11,7 @@ import com.yuschukivan.remindme.RemindApp
 import com.yuschukivan.remindme.common.utils.Util
 import com.yuschukivan.remindme.features.task.edit.EditTaskActivity
 import com.yuschukivan.remindme.models.Reminder
+import com.yuschukivan.remindme.models.SubTask
 import com.yuschukivan.remindme.models.Task
 import com.yuschukivan.remindme.models.TaskShownPair
 import com.yuschukivan.remindme.services.NotificationReceiver
@@ -146,6 +148,7 @@ class CalendarPresenter @Inject constructor(): MvpPresenter<CalendarView>() {
     fun onDoneTask(task: Task) {
         realm.executeTransaction {
             task.doneDate = Calendar.getInstance().time
+            task.subTasks.forEach { it.completed = true }
             viewState.reloadAdapter()
         }
     }
@@ -153,6 +156,7 @@ class CalendarPresenter @Inject constructor(): MvpPresenter<CalendarView>() {
     fun onUndoTask(task: Task) {
         realm.executeTransaction {
             task.doneDate = null
+            task.subTasks.forEach { it.completed = false }
             viewState.reloadAdapter()
         }
     }
@@ -161,4 +165,21 @@ class CalendarPresenter @Inject constructor(): MvpPresenter<CalendarView>() {
         lastDatePicked = dateClicked
     }
 
+    fun onShowSubtasks(query: Int) {
+        Log.d("Tasks Fragment", "position on show: $query")
+        val shown = tasks[query].shown
+        tasks[query].shown = !shown
+        viewState.updateItem(query)
+    }
+
+    fun onCompletesSubtask(query: Pair<Long, Int>) {
+        val subtaskId = query.first
+        val taskPosition = query.second
+        Log.d("Tasks Fragment", "position on complete: $taskPosition")
+        var subTask =  realm.where(SubTask::class.java).equalTo("id", subtaskId).findFirst()
+        realm.executeTransaction {
+            subTask.completed = !subTask.completed
+        }
+        viewState.updateItem(taskPosition)
+    }
 }

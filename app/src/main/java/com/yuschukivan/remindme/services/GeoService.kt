@@ -52,10 +52,8 @@ class GeoService : Service(), GoogleApiClient.ConnectionCallbacks, GoogleApiClie
     }
 
     override fun onConnected(bundle: Bundle?) {
-        Log.d("GEO", "Location client connected")
         if (mAction == Action.ADD) {
             val builder = GeofencingRequest.Builder()
-            Log.d("GEO", "Location client adds geofence")
             builder.setInitialTrigger(
                     if (transitionType == Geofence.GEOFENCE_TRANSITION_ENTER)
                         GeofencingRequest

@@ -10,6 +10,7 @@ import com.arellomobile.mvp.InjectViewState
 import com.arellomobile.mvp.MvpPresenter
 import com.google.android.gms.location.Geofence
 import com.google.android.gms.location.places.Place
+import com.squareup.picasso.Picasso
 import com.yuschukivan.remindme.RemindApp
 import com.yuschukivan.remindme.common.utils.Util
 import com.yuschukivan.remindme.models.Categoty
@@ -310,14 +311,23 @@ class EditTaskPresenter @Inject constructor(): MvpPresenter<EditTaskView>() {
     fun onLocationSelected(place: Place) {
         async {
             address = place.address.toString()
-            val url = URL("https://maps.googleapis.com/maps/api/staticmap?center=${place.latLng.latitude},${place.latLng.longitude}&zoom=15&size=850x200&markers=color:red%7C${place.latLng.latitude},${place.latLng.longitude}")
-            mapBitmap = await { BitmapFactory.decodeStream(url.openConnection().getInputStream()) }
+            //val url = URL("https://maps.googleapis.com/maps/api/staticmap?center=${place.latLng.latitude},${place.latLng.longitude}&zoom=15&size=850x200&markers=color:red%7C${place.latLng.latitude},${place.latLng.longitude}")
+            //mapBitmap = await { BitmapFactory.decodeStream(url.openConnection().getInputStream()) }
+            //latLong = place.latLng.latitude.toString() + "," + place.latLng.longitude.toString()
+            //viewState.setMapImage(mapBitmap!!)
+
+            val path = "https://maps.googleapis.com/maps/api/staticmap?center=${place.latLng.latitude},${place.latLng.longitude}&zoom=15&size=850x200&markers=color:blue%7C${place.latLng.latitude},${place.latLng.longitude}"
+            val mBit = await { Picasso.with(context).load(path).get() }
+            Log.d("MAP", mBit.toString() + mBit.byteCount)
             latLong = place.latLng.latitude.toString() + "," + place.latLng.longitude.toString()
-            viewState.setMapImage(mapBitmap!!)
+            mapBitmap = mBit
+            viewState.setMapImage(mBit)
         }
     }
 
     fun onRemoveMap() {
+        latLong = null
+        address = null
         mapBitmap = null
         viewState.removeMapImage()
     }

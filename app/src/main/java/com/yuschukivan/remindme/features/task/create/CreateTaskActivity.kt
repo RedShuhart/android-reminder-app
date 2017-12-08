@@ -21,6 +21,7 @@ import com.arellomobile.mvp.presenter.InjectPresenter
 import com.google.android.gms.location.places.ui.PlacePicker
 import com.makeramen.roundedimageview.RoundedImageView
 import com.philliphsu.bottomsheetpickers.time.numberpad.NumberPadTimePickerDialog
+import com.squareup.picasso.Picasso
 import com.wdullaer.materialdatetimepicker.date.DatePickerDialog
 import com.wdullaer.materialdatetimepicker.time.TimePickerDialog
 import com.yuschukivan.remindme.R
@@ -327,8 +328,9 @@ class CreateTaskActivity: BaseActivity(), CreateTaskView, AdapterView.OnItemSele
         builder.show()
     }
 
-    override fun setMapImage(bmp: Bitmap) {
-        mapImage.setImageBitmap(bmp)
+    override fun setMapImage(map: Bitmap) {
+        //Picasso.with(this).load(path).into(mapImage)
+        mapImage.setImageBitmap(map)
         mapImage.visibility = View.VISIBLE
         chooseLocationText.visibility = View.GONE
         addMapButton.setOnClickListener { presenter.onRemoveMap() }

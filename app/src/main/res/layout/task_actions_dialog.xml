@@ -7,6 +7,7 @@
     app:cardCornerRadius="4dp">
 
     <LinearLayout
+        android:id="@+id/actions_layout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical">
@@ -62,6 +63,19 @@
             android:layout_marginStart="4dp"
             android:layout_marginEnd="4dp"
             android:textAlignment="textStart"
+            android:textColor="@color/colorAccent" />
+
+        <Button
+            android:id="@+id/routes_button"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:drawableEnd="@drawable/navigation"
+            android:drawableTint="@color/colorAccent"
+            android:text="FIND ROUTES"
+            android:layout_marginStart="4dp"
+            android:layout_marginEnd="4dp"
+            android:textAlignment="textStart"
+            android:visibility="gone"
             android:textColor="@color/colorAccent" />
 
     </LinearLayout>

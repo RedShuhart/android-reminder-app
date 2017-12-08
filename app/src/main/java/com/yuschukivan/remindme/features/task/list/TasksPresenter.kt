@@ -48,13 +48,16 @@ class TasksPresenter: MvpPresenter<TasksView>() {
 
         tasks.clear()
         tasks.addAll(tasksList.map { task -> TaskShownPair(task, false) })
+        val currentTime = Calendar.getInstance().time.time
 
-        if(!filters.contains("DONE")) {
-            tasks.removeAll { it.task.doneDate != null }
-        }
-
-        if (!filters.contains("OVERDUE")) {
-            tasks.removeAll { it.task.dueDate!!.time < Calendar.getInstance().time.time }
+        if (!filters.contains("DONE") && !filters.contains("OVERDUE")) {
+            tasks.removeAll { it.task.doneDate != null || (it.task.dueDate!!.time < currentTime ) }
+        }else if(!filters.contains("DONE") && filters.contains("OVERDUE") ) {
+            tasks.removeAll { it.task.doneDate != null || (it.task.dueDate!!.time > currentTime )}
+        } else if (!filters.contains("OVERDUE") && filters.contains("DONE")) {
+            tasks.removeAll { it.task.dueDate!!.time < currentTime || it.task.doneDate == null }
+        } else if (filters.contains("DONE") && filters.contains("OVERDUE")) {
+            tasks.removeAll { !(it.task.doneDate != null && it.task.doneDate!!.time > it.task.dueDate!!.time)}
         }
 
         val sortedByPriority = tasks.sortedBy {
@@ -82,12 +85,16 @@ class TasksPresenter: MvpPresenter<TasksView>() {
         tasks.clear()
         tasks.addAll(taskList.map { task -> TaskShownPair(task, false) })
 
-        if(!filters.contains("DONE")) {
-            tasks.removeAll { it.task.doneDate != null }
-        }
+        val currentTime = Calendar.getInstance().time.time
 
-        if (!filters.contains("OVERDUE")) {
-            tasks.removeAll { it.task.dueDate!!.time < Calendar.getInstance().time.time }
+        if (!filters.contains("DONE") && !filters.contains("OVERDUE")) {
+            tasks.removeAll { it.task.doneDate != null || (it.task.dueDate!!.time < currentTime ) }
+        }else if(!filters.contains("DONE") && filters.contains("OVERDUE") ) {
+            tasks.removeAll { it.task.doneDate != null || (it.task.dueDate!!.time > currentTime )}
+        } else if (!filters.contains("OVERDUE") && filters.contains("DONE")) {
+            tasks.removeAll { it.task.dueDate!!.time < currentTime || it.task.doneDate == null }
+        } else if (filters.contains("DONE") && filters.contains("OVERDUE")) {
+            tasks.removeAll { !(it.task.doneDate != null && it.task.doneDate!!.time > it.task.dueDate!!.time)}
         }
 
         val sortedByPriority = tasks.sortedBy {
@@ -111,6 +118,7 @@ class TasksPresenter: MvpPresenter<TasksView>() {
     }
 
     fun onShowSubtasks(position: Int) {
+            Log.d("Tasks", "Show Subtasks")
             Log.d("Tasks Fragment", "position on show: $position")
             val shown = tasks[position].shown
             tasks[position].shown = !shown
@@ -156,6 +164,7 @@ class TasksPresenter: MvpPresenter<TasksView>() {
     fun onDoneTask(task: Task) {
         realm.executeTransaction {
             task.doneDate = Calendar.getInstance().time
+            task.subTasks.forEach { it.completed = true }
             viewState.reloadAdapter()
         }
     }
@@ -163,6 +172,7 @@ class TasksPresenter: MvpPresenter<TasksView>() {
     fun onUndoTask(task: Task) {
         realm.executeTransaction {
             task.doneDate = null
+            task.subTasks.forEach { it.completed = false }
             viewState.reloadAdapter()
         }
     }

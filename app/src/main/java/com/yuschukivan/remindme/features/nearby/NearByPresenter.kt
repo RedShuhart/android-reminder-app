@@ -104,7 +104,8 @@ class NearByPresenter @Inject constructor():  MvpPresenter<NearByView>() {
     private fun loadNearByReminders() {
         closeTasks = mutableListOf()
         val tasks = realm.where(Task::class.java).findAll()
-        tasks.forEach { task ->
+
+        tasks.filter { it.doneDate == null }.forEach { task ->
             task.latLong?.let {
                 val longLat = it.split(",")
                 val reminderLat = longLat[0].toDouble()
@@ -203,15 +204,17 @@ class NearByPresenter @Inject constructor():  MvpPresenter<NearByView>() {
     fun onDoneTask(task: Task) {
         realm.executeTransaction {
             task.doneDate = Calendar.getInstance().time
-            viewState.setStateIcon(task)
+            task.subTasks.forEach { it.completed = true }
         }
+        viewState.showInfo(task)
     }
 
     fun onUndoTask(task: Task) {
         realm.executeTransaction {
             task.doneDate = null
-            viewState.setStateIcon(task)
+            task.subTasks.forEach { it.completed = false }
         }
+        viewState.showInfo(task)
     }
 
     fun onShowActions(): Boolean {

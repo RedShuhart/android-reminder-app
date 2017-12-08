@@ -22,7 +22,7 @@ interface CreateTaskView: MvpView {
     fun addSubtaskToView(names: List<String>)
     fun removeSubtaskFromView(names: List<String>)
     fun showCreateSubtaskDialog()
-    fun setMapImage(bmp: Bitmap)
+    fun setMapImage(map: Bitmap)
     fun removeMapImage()
     @StateStrategyType(SkipStrategy::class)
     fun finishWithOk(position: Int)

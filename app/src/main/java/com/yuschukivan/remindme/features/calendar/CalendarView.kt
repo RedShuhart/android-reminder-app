@@ -25,4 +25,5 @@ interface CalendarView: MvpView {
     fun showPlaceholder(show: Boolean)
     fun reloadAdapter()
     fun startEditing(intent: Intent)
+    fun updateItem(position: Int)
 }

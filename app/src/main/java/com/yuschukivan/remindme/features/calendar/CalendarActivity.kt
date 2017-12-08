@@ -2,6 +2,10 @@ package com.yuschukivan.remindme.features.calendar
 
 import android.app.Activity
 import android.content.Intent
+import android.graphics.Color
+import android.graphics.PorterDuff
+import android.graphics.PorterDuffColorFilter
+import android.net.Uri
 import android.os.Bundle
 import android.support.v7.app.AlertDialog
 import android.support.v7.widget.LinearLayoutManager
@@ -9,6 +13,7 @@ import android.support.v7.widget.RecyclerView
 import android.support.v7.widget.Toolbar
 import android.view.View
 import android.widget.Button
+import android.widget.LinearLayout
 import android.widget.TextView
 import com.arellomobile.mvp.presenter.InjectPresenter
 import com.yuschukivan.remindme.R
@@ -88,22 +93,13 @@ class CalendarActivity: BaseActivity(), CalendarView {
         remindersView.addOnItemTouchListener(
                 RecycleItemClickListener(applicationContext, remindersView, object: RecycleItemClickListener.OnItemClickListener {
                     override fun onItemClick(view: View, position: Int) {
-                        presenter.onRemindClick(remindAdapter[position])
                     }
 
-                    override fun onLongItemClick(view: View, position: Int) {}
+                    override fun onLongItemClick(view: View, position: Int) {
+                        presenter.onRemindClick(remindAdapter[position])
+                    }
                 }))
 
-//        tasksView.addOnItemTouchListener(
-//                RecycleItemClickListener(applicationContext, remindersView, object: RecycleItemClickListener.OnItemClickListener {
-//                    override fun onItemClick(view: View, position: Int) {
-//
-//                    }
-//
-//                    override fun onLongItemClick(view: View, position: Int) {
-//                        presenter.onTaskClick(tasksAdapter[position])
-//                    }
-//                }))
     }
 
     override fun onResume() {
@@ -113,6 +109,18 @@ class CalendarActivity: BaseActivity(), CalendarView {
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe {
                     query -> presenter.onTaskClick(tasksAdapter[query.second])
+                }.unsubscribeOnDestroy()
+
+        tasksAdapter.viewsSubtasks
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe {
+                    query -> presenter.onShowSubtasks(query)
+                }.unsubscribeOnDestroy()
+
+        tasksAdapter.completesSubtask
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe {
+                    query -> presenter.onCompletesSubtask(query)
                 }.unsubscribeOnDestroy()
     }
 
@@ -133,6 +141,10 @@ class CalendarActivity: BaseActivity(), CalendarView {
         tasksView.visibility = View.VISIBLE
         if(tasks.isEmpty()) tasksView.visibility = View.GONE
 
+    }
+
+    override fun updateItem(position: Int) {
+        tasksAdapter.notifyItemChanged(position)
     }
 
     override fun updateReminders(reminders: List<Reminder>) {
@@ -197,6 +209,22 @@ class CalendarActivity: BaseActivity(), CalendarView {
         val builder = AlertDialog.Builder(this)
         builder.setTitle(task.name)
         val view = layoutInflater.inflate(R.layout.task_actions_dialog, null)
+
+        val layout = view.findViewById(R.id.actions_layout) as LinearLayout
+
+        task.latLong?.let { latLong ->
+            val navigationButton = view.findViewById(R.id.routes_button).apply {
+                visibility = View.VISIBLE
+                setOnClickListener{
+                    val coords = latLong.split(",")
+                    val uri = "http://maps.google.com/maps?daddr=${coords[0]},${coords[1]} ${task.name}"
+                    val intent = Intent(Intent.ACTION_VIEW, Uri.parse(uri))
+                    intent.`package` = "com.google.android.apps.maps"
+                    startActivity(intent)
+                }
+            }
+        }
+
         val editButton = view.findViewById(R.id.edit_button) as Button
         editButton.setOnClickListener {
             presenter.onEditTask(task)
@@ -213,16 +241,16 @@ class CalendarActivity: BaseActivity(), CalendarView {
         if ( task.doneDate == null) {
             doneButton.setOnClickListener {
                 presenter.onDoneTask(task)
-                actionsDialog.dismiss()
                 presenter.onDatePick(presenter.lastDatePicked)
+                actionsDialog.dismiss()
             }
         } else {
+            doneButton.text = "UNDO"
+            doneButton.setCompoundDrawablesWithIntrinsicBounds(null, null, getDrawable(R.drawable.calendar_remove), null)
             doneButton.setOnClickListener {
-                doneButton.text = "UNDO"
-                doneButton.setCompoundDrawablesWithIntrinsicBounds(null, null, getDrawable(R.drawable.calendar_remove), null)
                 presenter.onUndoTask(task)
-                actionsDialog.dismiss()
                 presenter.onDatePick(presenter.lastDatePicked)
+                actionsDialog.dismiss()
             }
         }
 

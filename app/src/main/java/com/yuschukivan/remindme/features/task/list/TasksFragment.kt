@@ -4,15 +4,21 @@ import android.app.Activity
 import android.app.Activity.RESULT_CANCELED
 import android.content.DialogInterface
 import android.content.Intent
+import android.graphics.Color
+import android.graphics.PorterDuff
+import android.graphics.PorterDuffColorFilter
+import android.net.Uri
 import android.os.Bundle
 import android.support.v7.app.AlertDialog
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
 import android.widget.EditText
+import android.widget.LinearLayout
 import android.widget.TextView
 import com.arellomobile.mvp.presenter.InjectPresenter
 import com.arellomobile.mvp.presenter.PresenterType
@@ -32,6 +38,9 @@ import com.yuschukivan.remindme.models.TaskShownPair
 import com.yuschukivan.remindme.mvp.presenters.FragmentRemindersPresenter
 import io.reactivex.android.schedulers.AndroidSchedulers
 import org.w3c.dom.Text
+import android.support.v4.content.ContextCompat.startActivity
+import java.util.*
+
 
 /**
  * Created by yusch on 08.11.2017.
@@ -163,6 +172,21 @@ class TasksFragment: BaseFragment(), TasksView {
         val view = activity.layoutInflater.inflate(R.layout.task_actions_dialog, null)
         val taskName = view.findViewById(R.id.task_name) as TextView
         taskName.text = task.name
+        val layout = view.findViewById(R.id.actions_layout) as LinearLayout
+
+        task.latLong?.let { latLong ->
+            val navigationButton = view.findViewById(R.id.routes_button).apply {
+                visibility = View.VISIBLE
+                setOnClickListener{
+                    val coords = latLong.split(",")
+                    val uri = "http://maps.google.com/maps?daddr=${coords[0]},${coords[1]} ${task.name}"
+                    val intent = Intent(Intent.ACTION_VIEW, Uri.parse(uri))
+                    intent.`package` = "com.google.android.apps.maps"
+                    startActivity(intent)
+                }
+            }
+        }
+
         val editButton = view.findViewById(R.id.edit_button) as Button
         editButton.setOnClickListener {
             presenter.onEditTask(task)

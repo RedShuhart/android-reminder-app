@@ -45,10 +45,10 @@ class StatisticsPresenter: MvpPresenter<StatisticsView>() {
             "#78909C")
 
     val otherColors = listOf<String>(
-            "#6200EA",
-            "#FF3D00",
             "#0091EA",
-            "#AA00FF")
+            "#00C853",
+            "#FFAB00",
+            "#D50000")
 
     init {
         RemindApp.appComponent.inject(this)
@@ -70,13 +70,12 @@ class StatisticsPresenter: MvpPresenter<StatisticsView>() {
         }
     }
 
-
+    val categoriesStats = mutableListOf<StatisticsData>()
 
     fun loadStats() {
-
+        categoriesStats.clear()
         val categories = realm.where(Categoty::class.java).findAll()
         val tasks = realm.where(Task::class.java).findAll()
-        val categoriesStats = mutableListOf<StatisticsData>()
         val currentTime = Calendar.getInstance().time.time
 
         categories.forEach { category ->
@@ -97,60 +96,86 @@ class StatisticsPresenter: MvpPresenter<StatisticsView>() {
             Log.d("stats", stats.toString())
             categoriesStats.add(stats)
         }
-
-        fillEstimated(categoriesStats)
-        fillSpent(categoriesStats)
-        fillTotal(categoriesStats)
-        fillTasks(categoriesStats)
     }
 
-    fun fillEstimated(stats: List<StatisticsData>) {
-        val entries = stats.map { PieEntry(it.timeEstimated.toFloat(), it.typeName) }
+    fun fillEstimated() {
+        val entries = categoriesStats.filter { it.timeEstimated > 0 }.map { PieEntry(it.timeEstimated.toFloat(), it.typeName) }
         val pieSet = PieDataSet(entries, "Estimated Time")
         pieSet.colors = chartColors.map { Color.parseColor(it) }
         pieSet.valueTextSize = 12f
         pieSet.valueTextColor = (Color.parseColor("#FFFFFF"))
-        pieSet.setValueFormatter { value, entry, dataSetIndex, viewPortHandler ->
-            "${"%.1f".format(value / 60)} H"
+        pieSet.setValueFormatter { value, _, _, _ ->
+            if(value > 0) "${"%.1f".format(value / 60)} H" else ""
         }
-        viewState.showEstimated(pieSet)
+        viewState.showData(pieSet)
     }
 
-    fun fillSpent(stats: List<StatisticsData>) {
-        val entries = stats.map { PieEntry(it.timeSpent.toFloat(), it.typeName) }
+    fun fillSpent() {
+        val entries = categoriesStats.filter { it.timeSpent > 0 }.map { PieEntry(it.timeSpent.toFloat(), it.typeName) }
         val pieSet = PieDataSet(entries, "Spent Time")
         pieSet.colors = chartColors.map { Color.parseColor(it) }
         pieSet.valueTextSize = 12f
         pieSet.valueTextColor = (Color.parseColor("#FFFFFF"))
         pieSet.setValueFormatter { value, entry, dataSetIndex, viewPortHandler ->
-            "${"%.1f".format(value / 60)} H"
+            if(value > 0) "${"%.1f".format(value / 60)} H" else ""
         }
-        viewState.showSpent(pieSet)
+        viewState.showData(pieSet)
     }
 
-    fun fillTotal(stats: List<StatisticsData>) {
-        val entries = stats.map { PieEntry(it.totalTime.toFloat(), it.typeName) }
+    fun fillTotal() {
+        val entries = categoriesStats.filter { it.totalTime > 0 }.map { PieEntry(it.totalTime.toFloat(), it.typeName) }
         val pieSet = PieDataSet(entries, "Total Time")
         pieSet.colors = chartColors.map { Color.parseColor(it) }
         pieSet.valueTextSize = 12f
         pieSet.valueTextColor = (Color.parseColor("#FFFFFF"))
-        pieSet.setValueFormatter { value, entry, dataSetIndex, viewPortHandler ->
-            "${"%.1f".format(value / 60)} H"
+        pieSet.setValueFormatter { value, _, _, _ ->
+            if(value > 0) "${"%.1f".format(value / 60)} H" else ""
         }
-        viewState.showTotal(pieSet)
+        viewState.showData(pieSet)
     }
 
-    fun fillTasks(stats: List<StatisticsData>) {
+    fun fillTasks2() {
+
         val tasks = listOf<Pair<Int, String>>(
-                Pair(stats.map { it.doneTasks }.sum(), "Done"),
-                Pair(stats.map{ it.overdueTasks }.sum(), "Overdue"),
-                Pair(stats.map { it.totalTasks }.sum() - stats.map{ it.overdueTasks }.sum() - stats.map { it.doneTasks }.sum(), "Current"),
-                Pair(stats.map { it.totalTasks }.sum(), "All")
+                Pair(categoriesStats.map { it.doneTasks }.sum(), "Done"),
+                Pair(categoriesStats.map{ it.overdueTasks }.sum(), "Overdue"),
+                Pair(categoriesStats.map { it.totalTasks }.sum() - categoriesStats.map{ it.overdueTasks }.sum() - categoriesStats.map { it.doneTasks }.sum(), "Current")
+                /*Pair(stats.map { it.totalTasks }.sum(), "All")*/
         ).mapIndexed { index, pair ->  BarEntry(index.toFloat(), pair.first.toFloat(), pair.second)}
 
         val dataSet = BarDataSet(tasks, "Tasks status")
         dataSet.colors = otherColors.map { Color.parseColor(it) }
-
-        viewState.showTasks(dataSet)
+        viewState.showData(dataSet)
     }
+
+    fun fillTasks() {
+        val tasks = realm.where(Task::class.java).findAll()
+        var current = 0
+        var done = 0
+        var overdue = 0
+        var overdueDone = 0;
+
+        val currentTime = Calendar.getInstance().time.time
+
+        tasks.forEach { when {
+            it.doneDate != null && it.doneDate!!.time <= it.dueDate!!.time ->  done ++
+            it.doneDate != null && it.doneDate!!.time > it.dueDate!!.time -> overdueDone ++
+            it.doneDate == null && it.dueDate!!.time < currentTime -> overdue++
+            else -> current++
+        } }
+
+        val stats = listOf(
+                "Current" to current,
+                "Done" to done,
+                "Overdue done" to overdueDone,
+                "Overdue" to overdue
+        ).mapIndexed { index, pair -> BarEntry(index.toFloat(), pair.second.toFloat(), pair.first)  }
+        val dataSet = BarDataSet(stats, "Tasks status")
+        dataSet.colors = otherColors.map { Color.parseColor(it) }
+        dataSet.valueTextSize = 15f
+        Log.d("statistics", "current $current done $done overdue $overdue overdueDone $overdueDone total ${tasks}")
+
+        viewState.showData(dataSet)
+    }
+
 }

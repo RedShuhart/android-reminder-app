@@ -133,7 +133,7 @@ class NearByActivity: BaseActivity(), OnMapReadyCallback, NearByView, GoogleMap.
     override fun showInfo(task: Task) {
 
         subtasksView.visibility = View.GONE
-
+        estimatedView.text = "────"
         task.estimatedTime?.let {
             estimatedView.text = "${it / 60} H ${it % 60} Min"
         }
@@ -155,6 +155,8 @@ class NearByActivity: BaseActivity(), OnMapReadyCallback, NearByView, GoogleMap.
                     showSubtasks.text = "Hide Subtasks"
                 }
             }
+        } else {
+            showSubtasks.text = "No Subtasks"
         }
 
 
@@ -228,6 +230,10 @@ class NearByActivity: BaseActivity(), OnMapReadyCallback, NearByView, GoogleMap.
 
     override fun setStateIcon(task: Task) {
         when {
+            task.doneDate != null && task.dueDate!!.time < task.doneDate!!.time  -> {
+                taskStatus.setBackgroundResource(R.drawable.calendar_check_yellow)
+                taskStatus.setColorFilter(Color.parseColor("#1B5E20"))
+            }
             task.dueDate!!.time < Calendar.getInstance().time.time -> {
                 taskStatus.setBackgroundResource(R.drawable.alert_circle_outline)
                 taskStatus.setColorFilter(Color.parseColor("#D50000"))
@@ -260,13 +266,12 @@ class NearByActivity: BaseActivity(), OnMapReadyCallback, NearByView, GoogleMap.
         if ( task.doneDate == null) {
             doneButton.setOnClickListener {
                 presenter.onDoneTask(task)
-                presenter.onDoneTask(task)
                 actionsDialog.dismiss()
             }
         } else {
+            doneButton.text = "UNDO"
+            doneButton.setCompoundDrawablesWithIntrinsicBounds(null, null, getDrawable(R.drawable.calendar_remove), null)
             doneButton.setOnClickListener {
-                doneButton.text = "UNDO"
-                doneButton.setCompoundDrawablesWithIntrinsicBounds(null, null, getDrawable(R.drawable.calendar_remove), null)
                 presenter.onUndoTask(task)
                 actionsDialog.dismiss()
             }
